@@ -57,7 +57,7 @@ export default function HomePage() {
                   </p>
                 </div>
                 <Link
-                  to={`/post/${post._id}`}
+                  to={`/posts/${post._id}`}
                   className="mt-auto inline-block text-blue-600 hover:underline text-sm"
                 >
                   Read More →
