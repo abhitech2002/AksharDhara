@@ -33,12 +33,21 @@ export default function PostDetail() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-blue-100 text-gray-800">
       <div className="max-w-4xl mx-auto px-6 py-12">
-        <Link
-          to="/"
-          className="inline-block mb-6 text-blue-600 hover:text-blue-800 text-sm font-medium"
-        >
-          ← Back to Blog
-        </Link>
+        <div className="flex items-center justify-between mb-6">
+          <Link
+            to="/"
+            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+          >
+            ← Back to Blog
+          </Link>
+
+          <Link
+            to={`/edit/${post._id}`}
+            className="bg-yellow-500 text-white px-4 py-1 rounded-md text-sm font-semibold hover:bg-yellow-600 transition"
+          >
+            ✎ Edit Post
+          </Link>
+        </div>
 
         <article className="bg-white p-8 rounded-2xl shadow-lg">
           <h1 className="text-4xl font-bold mb-4 text-gray-900">

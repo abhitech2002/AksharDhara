@@ -22,4 +22,24 @@ const getBlogById = async (id) => {
     }
 }
 
-export { getBlogs, getBlogById };
+const createBlog = async (blogData) => {
+    try {
+        const response = await axios.post(API_URL, blogData);
+        return response.data.data;
+    } catch (error) {
+        console.error('Error creating blog:', error);
+        throw error;
+    }
+};
+
+const updateBlog = async (id, blogData) => {
+    try {
+        const response = await axios.put(`${API_URL}${id}`, blogData);
+        return response.data.data;
+    } catch (error) {
+        console.error('Error updating blog:', error);
+        throw error;
+    }
+};
+
+export { getBlogs, getBlogById, createBlog, updateBlog };
