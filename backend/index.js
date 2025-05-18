@@ -2,12 +2,14 @@ import express from 'express';
 import { configDotenv } from 'dotenv';
 import connectDB from './config/db.js';
 import blogRoutes from './routes/blogRoutes.js';
+import cors from 'cors';
 
 configDotenv();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
