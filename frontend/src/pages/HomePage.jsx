@@ -1,7 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 export default function HomePage() {
+  // Mock blog post data for UI rendering
   const posts = [
     {
       id: 1,
@@ -30,63 +33,52 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-blue-50 flex flex-col justify-between">
       {/* Header Navbar */}
-      <header className="bg-white shadow mb-8">
-        <div className="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
-          <Link to="/" className="text-2xl font-bold text-blue-600">
-            AksharDhara
-          </Link>
-          <nav className="space-x-4">
-            <Link to="/" className="text-gray-700 hover:text-blue-600">
-              Home
-            </Link>
-            <Link to="/login" className="text-gray-700 hover:text-blue-600">
-              Login
-            </Link>
-            <Link to="/register" className="text-gray-700 hover:text-blue-600">
-              Register
-            </Link>
-          </nav>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Blog Feed */}
-      <div className="max-w-5xl mx-auto px-4 pb-10">
-        <h1 className="text-4xl font-bold text-gray-800 mb-8">
-          Latest Blog Posts
+      <main className="max-w-6xl mx-auto px-6 py-12">
+        <h1 className="text-5xl font-bold text-gray-800 mb-12 text-center">
+          Explore Fresh Ideas
         </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {posts.map((post) => (
             <div
               key={post.id}
-              className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition"
+              className="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl transition duration-300 flex flex-col justify-between"
             >
-              <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-                {post.title}
-              </h2>
-              <p className="text-sm text-gray-500 mb-1">
-                By {post.author} • {post.date}
-              </p>
-              <p className="text-gray-700 mb-4">{post.excerpt}</p>
-              <Link
-                to={`/posts/${post.id}`}
-                className="text-blue-600 hover:underline"
-              >
-                Read More →
-              </Link>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2 hover:text-blue-700 transition duration-200 cursor-pointer">
+                  {post.title}
+                </h2>
+                <p className="text-sm text-gray-500 mb-2">
+                  By{" "}
+                  <span className="font-medium text-gray-700">
+                    {post.author}
+                  </span>{" "}
+                  • {post.date}
+                </p>
+                <p className="text-gray-700 text-base leading-relaxed mb-4 line-clamp-3">
+                  {post.excerpt}
+                </p>
+              </div>
+              <div>
+                <Link
+                  to={`/posts/${post.id}`}
+                  className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg mt-auto hover:bg-blue-700 transition"
+                >
+                  Read More →
+                </Link>
+              </div>
             </div>
           ))}
         </div>
-      </div>
+      </main>
 
       {/* Footer */}
-      <footer className="bg-white mt-16 shadow-inner">
-        <div className="max-w-5xl mx-auto px-4 py-6 text-center text-gray-600 text-sm">
-          © {new Date().getFullYear()} AksharDhara. All rights reserved.
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

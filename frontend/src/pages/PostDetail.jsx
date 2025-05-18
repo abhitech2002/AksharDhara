@@ -1,37 +1,53 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { useParams } from "react-router-dom";
+import React from 'react';
+import { useParams, Link } from 'react-router-dom';
 
 export default function PostDetail() {
   const { id } = useParams();
 
+  // Simulated post data
   const post = {
-    1: {
-      title: "How to Learn React Step-by-Step",
-      content:
-        "React is a JavaScript library for building user interfaces. Start by learning components, props, and hooks...",
-    },
-    2: {
-      title: "Tailwind CSS Tips for Clean UI",
-      content:
-        "Tailwind CSS helps you build UIs faster with utility classes. Learn spacing, layout, and responsive tips...",
-    },
-    3: {
-      title: "Why You Should Learn JavaScript First",
-      content:
-        "JavaScript is the foundation of web development. Before learning React or Vue, get solid with JS basics...",
-    },
-  }[id];
+    title: 'How to Learn React Step-by-Step',
+    author: 'John Doe',
+    date: 'May 10, 2025',
+    content: `React is one of the most popular frontend libraries. To learn it:
 
-  if (!post)
-    return (
-      <div className="text-center text-red-500 mt-10">Post not found.</div>
-    );
+1. Start with understanding JSX syntax.
+2. Learn how components work — both functional and class-based.
+3. Understand hooks like useState, useEffect.
+4. Build simple projects like Todo apps.
+
+The key is consistency and practice.`
+  };
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold mb-4 text-gray-800">{post.title}</h1>
-      <p className="text-lg text-gray-700 leading-7">{post.content}</p>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-blue-100 text-gray-800">
+      <div className="max-w-4xl mx-auto px-6 py-12">
+        <Link
+          to="/"
+          className="inline-block mb-6 text-blue-600 hover:text-blue-800 text-sm font-medium"
+        >
+          ← Back to Blog
+        </Link>
+
+        <article className="bg-white p-8 rounded-2xl shadow-lg">
+          <h1 className="text-4xl font-bold mb-4 text-gray-900">{post.title}</h1>
+          <p className="text-sm text-gray-500 mb-6">
+            By <span className="font-semibold">{post.author}</span> • {post.date}
+          </p>
+
+          <div className="prose prose-blue max-w-none">
+            {post.content.split('\n').map((para, idx) => (
+              <p key={idx}>{para}</p>
+            ))}
+          </div>
+        </article>
+      </div>
+
+      <footer className="bg-white shadow-inner mt-12">
+        <div className="max-w-6xl mx-auto px-6 py-6 text-center text-gray-600 text-sm">
+          © {new Date().getFullYear()} AksharDhara. All rights reserved.
+        </div>
+      </footer>
     </div>
   );
 }
