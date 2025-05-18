@@ -28,10 +28,20 @@ export default function HomePage() {
       <Navbar />
 
       {/* Blog Feed */}
-      <main className="max-w-7xl mx-auto px-6 py-12">
-        <h1 className="text-5xl font-bold text-center mb-12 text-gray-900 tracking-tight">
-          Explore Fresh Ideas
-        </h1>
+      <main className="max-w-6xl mx-auto px-6 py-12">
+        <div className="border-b border-gray-300 pb-6 mb-6">
+          <div className="flex items-center justify-between">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight">
+              Explore Fresh Ideas
+            </h1>
+            <Link
+              to="/create"
+              className="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition"
+            >
+              + Create Post
+            </Link>
+          </div>
+        </div>
 
         {loading ? (
           <p className="text-center text-gray-500">Loading blogs...</p>
