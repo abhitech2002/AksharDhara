@@ -23,9 +23,17 @@ function CreatePost() {
     }
   };
 
-  return(
+  return (
     <main className="max-w-3xl mx-auto px-6 py-12">
-      <h2 className="text-3xl font-bold mb-6 text-gray-800">Create New Post</h2>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-3xl font-bold text-gray-800">Create New Post</h2>
+        <button
+          onClick={() => navigate("/")}
+          className="text-blue-600 hover:underline"
+        >
+          ← Back to Home
+        </button>
+      </div>{" "}
       <form onSubmit={handleSubmit} className="space-y-6">
         <input
           type="text"
