@@ -2,6 +2,7 @@ import express from 'express';
 import { configDotenv } from 'dotenv';
 import connectDB from './config/db.js';
 import blogRoutes from './routes/blogRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 import cors from 'cors';
 
 configDotenv();
@@ -14,6 +15,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/v1/blogs', blogRoutes);
+app.use('/api/v1/auth', authRoutes);
 
 connectDB().then(() => {
     app.listen(PORT, () => {
