@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { resgister } from "../services/authService";
 
 function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -7,9 +8,23 @@ function RegisterPage() {
   const [username, setUsername] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Registering with:", username, email, password);
+    if (password !== confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
+    try {
+      const userData = { username, email, password };
+      await resgister(userData);
+      navigate("/login");
+    } catch (error) {
+      console.error("Registration failed:", error);
+      alert("Registration failed. Please try again.");
+    }
   };
 
   return (

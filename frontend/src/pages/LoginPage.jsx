@@ -1,20 +1,34 @@
-import React, {useState} from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { login } from "../services/authService";
 
 function LoginPage() {
+  const navigate = useNavigate();
 
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        console.log('Logging in with:', email, password);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const userData = { email, password };
+      const response = await login(userData);
+
+      localStorage.setItem("token", response.token);
+
+      navigate("/");
+    } catch (error) {
+      console.error("Login failed:", error);
+      alert("Login failed. Please check your credentials.");
     }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Login to Your Account</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+          Login to Your Account
+        </h2>
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className="block text-gray-600 mb-1">Email</label>
@@ -45,13 +59,15 @@ function LoginPage() {
             Login
           </button>
         </form>
-         <p className="text-center text-sm mt-4 text-gray-600">
+        <p className="text-center text-sm mt-4 text-gray-600">
           Don’t have an account?
-          <Link to="/register" className="text-blue-600 hover:underline ml-1">Register</Link>
+          <Link to="/register" className="text-blue-600 hover:underline ml-1">
+            Register
+          </Link>
         </p>
       </div>
     </div>
-  )
+  );
 }
 
-export default LoginPage
+export default LoginPage;
