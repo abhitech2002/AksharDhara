@@ -1,12 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import { getBlogById } from "../services/blogService";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { getBlogById, deleteBlog } from "../services/blogService";
 
 export default function PostDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const handleDelete = async () => {
+    const confirm = window.confirm(
+      "Are you sure you want to delete this post?"
+    );
+    if (!confirm) return;
+
+    try {
+      await deleteBlog(post._id);
+      navigate("/");
+    } catch (error) {
+      console.error("Error deleting blog:", error);
+    }
+  };
 
   useEffect(() => {
     const getBlog = async () => {
@@ -41,12 +56,21 @@ export default function PostDetail() {
             ← Back to Blog
           </Link>
 
-          <Link
+          <div>
+            <Link
             to={`/edit/${post._id}`}
             className="bg-yellow-500 text-white px-4 py-1 rounded-md text-sm font-semibold hover:bg-yellow-600 transition"
           >
             ✎ Edit Post
           </Link>
+
+          <button
+            onClick={handleDelete}
+            className="bg-red-500 text-white px-4 py-1 rounded-md text-sm font-semibold hover:bg-red-600 transition ml-4"
+          >
+            🗑 Delete Post
+          </button>
+          </div>
         </div>
 
         <article className="bg-white p-8 rounded-2xl shadow-lg">

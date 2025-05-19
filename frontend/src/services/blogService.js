@@ -42,4 +42,13 @@ const updateBlog = async (id, blogData) => {
     }
 };
 
-export { getBlogs, getBlogById, createBlog, updateBlog };
+const deleteBlog = async (id) => {
+    try {
+        await axios.delete(`${API_URL}${id}`);
+    } catch (error) {
+        console.error('Error deleting blog:', error);
+        throw error;
+    }
+};
+
+export { getBlogs, getBlogById, createBlog, updateBlog, deleteBlog };

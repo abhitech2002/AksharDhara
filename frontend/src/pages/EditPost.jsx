@@ -58,9 +58,21 @@ export default function EditPost() {
           onChange={(e) => setAuthor(e.target.value)}
           required
         />
-        <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
-          Update Post
-        </button>
+        <div className="flex space-x-4">
+          <button
+            type="submit"
+            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+          >
+            Update Post
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate(`/posts/${id}`)}
+            className="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400"
+          >
+            Cancel
+          </button>
+        </div>
       </form>
     </main>
   );
