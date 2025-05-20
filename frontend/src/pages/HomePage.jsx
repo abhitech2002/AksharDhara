@@ -50,28 +50,56 @@ export default function HomePage() {
             {posts.map((post) => (
               <div
                 key={post._id}
-                className="bg-white rounded-2xl shadow-md hover:shadow-xl transition duration-300 p-6 flex flex-col justify-between"
+                className="bg-white rounded-2xl shadow-md hover:shadow-xl transition duration-300 flex flex-col overflow-hidden"
               >
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                {/* Cover Image */}
+                {post.coverImage ? (
+                  <img
+                    src={post.coverImage}
+                    alt="Cover"
+                    className="h-48 w-full object-cover"
+                  />
+                ) : (
+                  <div className="h-48 w-full bg-gray-200 flex items-center justify-center text-gray-500 text-sm">
+                    No Image
+                  </div>
+                )}
+
+                {/* Content */}
+                <div className="p-6 flex flex-col flex-grow">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-1">
                     {post.title}
                   </h2>
-                  <p className="text-sm text-gray-500 mb-3">
-                    By {post.author} •{" "}
+                  <p className="text-sm text-gray-500 mb-2">
+                    By {post.author?.username} •{" "}
                     {new Date(post.createdAt).toLocaleDateString()}
                   </p>
+
+                  {/* Tags */}
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {post.tags?.map((tag, index) => (
+                      <span
+                        key={index}
+                        className="bg-blue-100 text-blue-700 text-xs font-medium px-2.5 py-0.5 rounded"
+                      >
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+
                   <p className="text-gray-700 mb-4 text-sm leading-relaxed">
                     {post.content.length > 120
                       ? post.content.substring(0, 120) + "..."
                       : post.content}
                   </p>
+
+                  <Link
+                    to={`/posts/${post._id}`}
+                    className="mt-auto inline-block text-blue-600 hover:underline text-sm"
+                  >
+                    Read More →
+                  </Link>
                 </div>
-                <Link
-                  to={`/posts/${post._id}`}
-                  className="mt-auto inline-block text-blue-600 hover:underline text-sm"
-                >
-                  Read More →
-                </Link>
               </div>
             ))}
           </div>

@@ -5,7 +5,10 @@ import { createBlog } from "../services/blogService";
 function CreatePost() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [author, setAuthor] = useState("");
+  const [tags, setTags] = useState("");
+  const [coverImage, setCoverImage] = useState("");
+  const [isPublished, setIsPublished] = useState(false);
+
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -14,7 +17,12 @@ function CreatePost() {
       const newPost = {
         title,
         content,
-        author,
+        tags: tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter((tag) => tag !== ""),
+        coverImage,
+        isPublished,
       };
       await createBlog(newPost);
       navigate("/");
@@ -50,14 +58,31 @@ function CreatePost() {
           onChange={(e) => setContent(e.target.value)}
           required
         ></textarea>
-        <input
+         <input
           type="text"
-          placeholder="Author"
+          placeholder="Tags (comma separated)"
           className="w-full px-4 py-2 border rounded"
-          value={author}
-          onChange={(e) => setAuthor(e.target.value)}
-          required
+          value={tags}
+          onChange={(e) => setTags(e.target.value)}
         />
+         <input
+          type="text"
+          placeholder="Cover Image URL"
+          className="w-full px-4 py-2 border rounded"
+          value={coverImage}
+          onChange={(e) => setCoverImage(e.target.value)}
+        />
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="publish"
+            checked={isPublished}
+            onChange={(e) => setIsPublished(e.target.checked)}
+          />
+          <label htmlFor="publish" className="text-gray-700">
+            Publish now
+          </label>
+        </div>
         <button
           type="submit"
           className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
