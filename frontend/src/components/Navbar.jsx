@@ -18,12 +18,22 @@ export default function Navbar() {
           <Link to="/" className="text-gray-700 hover:text-blue-600">
             Home
           </Link>
+          {user && (
+            <Link
+              to="/drafts"
+              className="text-gray-700 hover:text-blue-600 font-semibold px-3 py-2 rounded-md hover:bg-blue-50 transition"
+            >
+              Drafts
+            </Link>
+          )}
           {user ? (
             <button onClick={logout} className="text-red-600">
               Logout
             </button>
           ) : (
-            <Link to="/login" className="text-gray-700 hover:text-blue-600">Login</Link>
+            <Link to="/login" className="text-gray-700 hover:text-blue-600">
+              Login
+            </Link>
           )}
           <Link to="/register" className="text-gray-700 hover:text-blue-600">
             Register

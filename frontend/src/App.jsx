@@ -6,6 +6,7 @@ import HomePage from './pages/HomePage'
 import PostDetail from './pages/PostDetail'
 import CreatePost from './pages/CreatePost'
 import EditPost from './pages/EditPost'
+import DraftsDashboard from './pages/DraftsDashboard'
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/posts/:id" element={<PostDetail />} />
+        <Route path="/drafts" element={<DraftsDashboard />} />
         <Route path="/create" element={<ProtectedRoute><CreatePost /></ProtectedRoute>} />
         <Route path="/edit/:id" element={<><ProtectedRoute><EditPost /></ProtectedRoute></>} />
       </Routes>
