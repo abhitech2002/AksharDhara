@@ -2,7 +2,9 @@ import Blog from "../models/Blog.js";
 
 export const createBlog = async (req, res) => {
     const { title, content, tags, coverImage, isPublished } = req.body;
-    const author = req.user._id;
+    const author = req.user.id;
+    // console.log("req.user:", req.user); // should contain _id
+
 
     try {
         const newBlog = new Blog({
@@ -43,7 +45,7 @@ export const getBlogById = async (req, res) => {
     const { id } = req.params;
 
     try {
-        const blog = await Blog.findById(id).populate("author", "name email");
+        const blog = await Blog.findById(id).populate("author", "username email");
         if (!blog) {
             return res.status(404).json({
                 success: false,
@@ -68,7 +70,7 @@ export const updateBlog = async (req, res) => {
         const blog = await Blog.findById(id);
         if (!blog) return res.status(404).json({ message: "Not found" });
 
-        if (blog.author.toString() !== req.user._id) {
+        if (blog.author.toString() !== req.user.id) {
             return res.status(403).json({ message: "Unauthorized" });
         }
 
