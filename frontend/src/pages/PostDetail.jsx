@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { getBlogById, deleteBlog } from "../services/blogService";
+import { jwtDecode } from "jwt-decode";
 
 export default function PostDetail() {
   const { id } = useParams();
@@ -8,6 +9,20 @@ export default function PostDetail() {
 
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [currentUserId, setCurrentUserId] = useState(null);
+
+  // Get current user from JWT
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setCurrentUserId(decoded.id);
+      } catch (err) {
+        console.error("Invalid token", err);
+      }
+    }
+  }, []);
 
   const handleDelete = async () => {
     const confirm = window.confirm("Are you sure you want to delete this post?");
@@ -43,6 +58,8 @@ export default function PostDetail() {
     return <div className="text-center py-10 text-red-500">Post not found</div>;
   }
 
+  const isAuthor = currentUserId && post.author?._id === currentUserId;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-blue-100 text-gray-800">
       <div className="max-w-4xl mx-auto px-6 py-12">
@@ -55,20 +72,22 @@ export default function PostDetail() {
             ← Back to Blog
           </Link>
 
-          <div>
-            <Link
-              to={`/edit/${post._id}`}
-              className="bg-yellow-500 text-white px-4 py-1 rounded-md text-sm font-semibold hover:bg-yellow-600 transition"
-            >
-              ✎ Edit Post
-            </Link>
-            <button
-              onClick={handleDelete}
-              className="bg-red-500 text-white px-4 py-1 rounded-md text-sm font-semibold hover:bg-red-600 transition ml-4"
-            >
-              🗑 Delete Post
-            </button>
-          </div>
+          {isAuthor && (
+            <div>
+              <Link
+                to={`/edit/${post._id}`}
+                className="bg-yellow-500 text-white px-4 py-1 rounded-md text-sm font-semibold hover:bg-yellow-600 transition"
+              >
+                ✎ Edit Post
+              </Link>
+              <button
+                onClick={handleDelete}
+                className="bg-red-500 text-white px-4 py-1 rounded-md text-sm font-semibold hover:bg-red-600 transition ml-4"
+              >
+                🗑 Delete Post
+              </button>
+            </div>
+          )}
         </div>
 
         <article className="bg-white rounded-2xl shadow-lg overflow-hidden">
