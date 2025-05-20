@@ -58,36 +58,34 @@ function CreatePost() {
           onChange={(e) => setContent(e.target.value)}
           required
         ></textarea>
-         <input
+        <input
           type="text"
           placeholder="Tags (comma separated)"
           className="w-full px-4 py-2 border rounded"
           value={tags}
           onChange={(e) => setTags(e.target.value)}
         />
-         <input
+        <input
           type="text"
           placeholder="Cover Image URL"
           className="w-full px-4 py-2 border rounded"
           value={coverImage}
           onChange={(e) => setCoverImage(e.target.value)}
         />
-        <div className="flex items-center space-x-2">
+        <label className="flex items-center space-x-2 mt-4">
           <input
             type="checkbox"
-            id="publish"
             checked={isPublished}
-            onChange={(e) => setIsPublished(e.target.checked)}
+            onChange={() => setIsPublished(!isPublished)}
           />
-          <label htmlFor="publish" className="text-gray-700">
-            Publish now
-          </label>
-        </div>
+          <span>Publish Now</span>
+        </label>
+
         <button
           type="submit"
-          className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+          className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 mt-6"
         >
-          Create Post
+          {isPublished ? "Publish Post" : "Save as Draft"}
         </button>
       </form>
     </main>

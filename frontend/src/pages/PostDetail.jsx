@@ -25,7 +25,9 @@ export default function PostDetail() {
   }, []);
 
   const handleDelete = async () => {
-    const confirm = window.confirm("Are you sure you want to delete this post?");
+    const confirm = window.confirm(
+      "Are you sure you want to delete this post?"
+    );
     if (!confirm) return;
 
     try {
@@ -90,6 +92,30 @@ export default function PostDetail() {
           )}
         </div>
 
+                  {!post.isPublished && (
+            <div className="flex items-center mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-700 rounded-lg shadow-sm">
+              <svg
+                className="w-6 h-6 mr-3 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z"
+                ></path>
+              </svg>
+              <p className="text-sm font-semibold">
+                ⚠️ This post is currently a{" "}
+                <span className="italic">draft</span> and not publicly visible.
+              </p>
+            </div>
+          )}
+
         <article className="bg-white rounded-2xl shadow-lg overflow-hidden">
           {/* Cover Image */}
           {post.coverImage && (
@@ -106,8 +132,8 @@ export default function PostDetail() {
             </h1>
 
             <p className="text-sm text-gray-500 mb-4">
-              By <span className="font-semibold">{post.author?.username}</span> •{" "}
-              {new Date(post.createdAt).toLocaleDateString()}
+              By <span className="font-semibold">{post.author?.username}</span>{" "}
+              • {new Date(post.createdAt).toLocaleDateString()}
             </p>
 
             {/* Tags */}
