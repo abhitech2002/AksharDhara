@@ -21,6 +21,16 @@ const getBlogs = async () => {
     }
 };
 
+const getUserDrafts = async () => {
+    try {
+        const response = await axios.get(API_URL + "drafts", getAuthHeaders());
+        return response.data.data;
+    } catch (error) {
+        console.error('Error fetching blogs:', error);
+        throw error;
+    }
+};
+
 const getBlogById = async (id) => {
     try {
         const response = await axios.get(`${API_URL}${id}`);
@@ -60,4 +70,4 @@ const deleteBlog = async (id) => {
     }
 };
 
-export { getBlogs, getBlogById, createBlog, updateBlog, deleteBlog };
+export { getBlogs, getBlogById, createBlog, updateBlog, deleteBlog, getUserDrafts };

@@ -3,8 +3,6 @@ import Blog from "../models/Blog.js";
 export const createBlog = async (req, res) => {
     const { title, content, tags, coverImage, isPublished } = req.body;
     const author = req.user.id;
-    // console.log("req.user:", req.user); // should contain _id
-
 
     try {
         const newBlog = new Blog({
@@ -41,6 +39,26 @@ export const getBlogs = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
+
+export const getUserDrafts = async (req, res) => {
+  try {
+    const drafts = await Blog.find({
+      author: req.user.id,
+      isPublished: false
+    })
+      .sort({ createdAt: -1 })
+      .populate("author", "username");
+      
+    res.status(200).json({
+      success: true,
+      message: "User drafts fetched successfully",
+      data: drafts,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 export const getBlogById = async (req, res) => {
     const { id } = req.params;
