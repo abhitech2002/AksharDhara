@@ -1,11 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createBlog } from "../services/blogService";
+import { marked } from "marked";
+import DOMPurify from "dompurify";
+import CreatableSelect from "react-select/creatable";
+
+const predefinedTags = [
+  { label: "React", value: "react" },
+  { label: "JavaScript", value: "javascript" },
+  { label: "Web Development", value: "web-development" },
+  { label: "Programming", value: "programming" },
+  { label: "CSS", value: "css" },
+  { label: "Node.js", value: "nodejs" },
+  { label: "Tutorial", value: "tutorial" },
+  { label: "Frontend", value: "frontend" },
+  { label: "Backend", value: "backend" },
+];
 
 function CreatePost() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [tags, setTags] = useState("");
+  const [tags, setTags] = useState([]);
   const [coverImage, setCoverImage] = useState("");
   const [isPublished, setIsPublished] = useState(false);
   const [fadeIn, setFadeIn] = useState(false);
@@ -30,16 +45,19 @@ function CreatePost() {
     img.src = coverImage;
   }, [coverImage]);
 
+  // Convert Markdown to sanitized HTML
+  // const createMarkup = (markdown) => {
+  //   const rawMarkup = marked.parse(markdown, { breaks: true });
+  //   return { __html: DOMPurify.sanitize(rawMarkup) };
+  // };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const newPost = {
         title,
         content,
-        tags: tags
-          .split(",")
-          .map((tag) => tag.trim())
-          .filter((tag) => tag !== ""),
+        tags: tags.map((tag) => tag.value.toLowerCase()),
         coverImage,
         isPublished,
       };
@@ -105,6 +123,40 @@ function CreatePost() {
             font-weight: 500;
             user-select: none;
           }
+          .markdown-preview {
+            border: 1px solid #d1d5db; /* gray-300 */
+            border-radius: 12px;
+            padding: 20px;
+            background: #f9fafb; /* gray-50 */
+            color: #374151; /* gray-700 */
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.15);
+            margin-top: 12px;
+            line-height: 1.6;
+          }
+          .markdown-preview h1, .markdown-preview h2, .markdown-preview h3 {
+            border-bottom: 2px solid #6366f1;
+            padding-bottom: 6px;
+            margin-top: 16px;
+          }
+          .markdown-preview code {
+            background-color: #e5e7eb; /* gray-200 */
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+          }
+          .markdown-preview pre {
+            background-color: #e5e7eb; /* gray-200 */
+            padding: 12px;
+            border-radius: 8px;
+            overflow-x: auto;
+          }
+          .markdown-preview a {
+            color: #4f46e5;
+            text-decoration: underline;
+          }
         `}
       </style>
       <main
@@ -141,6 +193,7 @@ function CreatePost() {
             <div>
               <textarea
                 placeholder="Content"
+                // placeholder="Content (Markdown supported)"
                 className="w-full px-5 py-4 text-lg border border-gray-300 rounded-lg shadow-sm h-48 resize-y focus:outline-none transition"
                 value={content}
                 maxLength={maxContentLength}
@@ -150,13 +203,46 @@ function CreatePost() {
               <div className="char-counter">
                 {content.length} / {maxContentLength}
               </div>
+              {/* Enable when the markdown format implement in the homepage and post blog page */}
+              {/* <div
+                className="markdown-preview"
+                dangerouslySetInnerHTML={createMarkup(content)}
+              /> */}
             </div>
-            <input
-              type="text"
-              placeholder="Tags (comma separated)"
-              className="w-full px-5 py-3 text-lg border border-gray-300 rounded-lg shadow-sm focus:outline-none transition"
+            <CreatableSelect
+              isMulti
+              options={predefinedTags}
+              onChange={(selectedOptions) => setTags(selectedOptions || [])}
               value={tags}
-              onChange={(e) => setTags(e.target.value)}
+              placeholder="Enter or create tags..."
+              classNamePrefix="react-select"
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  minHeight: "56px",
+                  fontSize: "1.125rem",
+                  borderRadius: "0.5rem",
+                  borderColor: "#d1d5db",
+                }),
+                multiValue: (base) => ({
+                  ...base,
+                  backgroundColor: "#6366f1",
+                  color: "white",
+                }),
+                multiValueLabel: (base) => ({
+                  ...base,
+                  color: "white",
+                  fontWeight: "600",
+                }),
+                multiValueRemove: (base) => ({
+                  ...base,
+                  color: "white",
+                  ":hover": {
+                    backgroundColor: "#4f46e5",
+                    color: "white",
+                  },
+                }),
+              }}
             />
             <div>
               <input
