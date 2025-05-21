@@ -65,7 +65,7 @@ export const getBlogById = async (req, res) => {
     const { id } = req.params;
 
     try {
-        const blog = await Blog.findById({ id, isDeleted: false }).populate("author", "username email");
+        const blog = await Blog.findById({ _id: id, isDeleted: false }).populate("author", "username email");
         if (!blog) {
             return res.status(404).json({
                 success: false,
