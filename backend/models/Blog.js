@@ -25,7 +25,11 @@ const blogSchema = new mongoose.Schema({
   isPublished: {
     type: Boolean,
     default: false,
-  }
-}, { timestamps: true }); 
+  },
+  isDeleted: { 
+    type: Boolean, 
+    default: false
+ },
+}, { timestamps: true });
 
 export default mongoose.model("Blog", blogSchema); 
