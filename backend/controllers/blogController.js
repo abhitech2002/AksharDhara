@@ -132,3 +132,27 @@ export const deleteBlog = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
+
+export const restoreBlog = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const blog = await Blog.findById(id);
+        if (!blog || !blog.isDeleted) {
+            return res.status(404).json({ success: false, message: "Blog not found" });
+        }
+        if (blog.author.toString() !== req.user._id) {
+            return res.status(403).json({ message: "Unauthorized" });
+        }
+
+        blog.isDeleted = false;
+        await blog.save();
+        res.status(200).json({
+            success: true,
+            message: "Blog restored successfully",
+            data: blog,
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
