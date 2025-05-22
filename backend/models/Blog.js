@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { softDeletePlugin } from "../plugins/softDeletePlugin.js";
 
 const blogSchema = new mongoose.Schema({
   title: {
@@ -31,5 +32,8 @@ const blogSchema = new mongoose.Schema({
     default: false
  },
 }, { timestamps: true });
+
+// Apply the soft delete plugin to the schema
+blogSchema.plugin(softDeletePlugin);
 
 export default mongoose.model("Blog", blogSchema); 
