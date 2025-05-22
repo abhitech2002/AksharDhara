@@ -26,6 +26,14 @@ export default function Navbar() {
               Drafts
             </Link>
           )}
+          {user && (
+            <Link
+              to="/dashboard"
+              className="text-gray-700 hover:text-blue-600 font-semibold px-3 py-2 rounded-md hover:bg-blue-50 transition"
+            >
+              Dashboard
+            </Link>
+          )}
           {user ? (
             <button onClick={logout} className="text-red-600">
               Logout
