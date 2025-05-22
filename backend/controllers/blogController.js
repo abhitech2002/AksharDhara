@@ -1,4 +1,5 @@
 import Blog from "../models/Blog.js";
+import { buildQueryOptions } from "../utils/paginationSearch.js"
 
 export const createBlog = async (req, res) => {
     const { title, content, tags, coverImage, isPublished } = req.body;
@@ -26,19 +27,32 @@ export const createBlog = async (req, res) => {
 }
 
 export const getBlogs = async (req, res) => {
-    try {
-        const blogs = await Blog.find({ isPublished: true, isDeleted: false })
-            .populate("author", "username email")
-            .sort({ createdAt: -1 })
-        res.status(200).json({
-            success: true,
-            message: "Blogs fetched successfully",
-            data: blogs,
-        });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-}
+  try {
+    const { query, pagination, sort } = buildQueryOptions(req.query, [
+      "title",
+      "content",
+      "tags",
+    ]);
+
+    const blogs = await Blog.find(query)
+      .populate("author", "username email")
+      .sort(sort)
+      .skip(pagination.skip)
+      .limit(pagination.limit);
+
+    const total = await Blog.countDocuments(query);
+
+    res.status(200).json({
+      success: true,
+      message: "Blogs fetched successfully",
+      data: blogs,
+      totalPages: Math.ceil(total / pagination.limit),
+      currentPage: pagination.page,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 export const getUserDrafts = async (req, res) => {
     try {
@@ -146,6 +160,7 @@ export const restoreBlog = async (req, res) => {
         }
 
         blog.isDeleted = false;
+        blog.deletedAt = new Date();
         await blog.save();
         res.status(200).json({
             success: true,
