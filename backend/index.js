@@ -4,6 +4,7 @@ import connectDB from './config/db.js';
 import blogRoutes from './routes/blogRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import cors from 'cors';
+import "./utils/cronJobs/deleteExpiredBlogs.js";
 
 configDotenv();
 
