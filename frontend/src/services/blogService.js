@@ -85,4 +85,29 @@ const deleteBlog = async (id) => {
     }
 };
 
-export { getBlogs, getBlogById, createBlog, updateBlog, deleteBlog, getUserDrafts };
+const getMyBlogs = async () => {
+  try {
+    const response = await axios.get(`${API_URL}my-blogs`, getAuthHeaders());
+    console.log(response.data.data);
+    return response.data.data;
+  } catch (error) {
+    console.error("Error fetching your blogs:", error);
+    throw error;
+  }
+};
+
+const togglePublishBlog = async (blogId) => {
+  try {
+    const response = await axios.patch(
+      `${API_URL}${blogId}/toggle-publish`,
+      {},
+      getAuthHeaders()
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error toggling publish status:", error);
+    throw error;
+  }
+};
+
+export { getBlogs, getBlogById, createBlog, updateBlog, deleteBlog, getUserDrafts, getMyBlogs, togglePublishBlog };
