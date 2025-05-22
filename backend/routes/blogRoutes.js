@@ -5,7 +5,9 @@ import {
   getBlogById,
   updateBlog,
   deleteBlog,
-  getUserDrafts
+  getUserDrafts,
+  getMyBlogs,
+  togglePublishStatus,
 } from '../controllers/blogController.js';
 import { authenticate } from '../middlewares/authMiddleware.js';
 import {createBlogSchema} from "../validators/blogValidator.js";
@@ -16,6 +18,8 @@ const router = express.Router();
 router.post('/', authenticate, validate(createBlogSchema), createBlog);
 router.get('/', getBlogs);
 router.get('/drafts', authenticate, getUserDrafts);
+router.get('/my-blogs', authenticate, getMyBlogs);
+router.put('/:id/toggle-publish', authenticate, togglePublishStatus);
 router.get('/:id', getBlogById);
 router.put('/:id',authenticate, updateBlog);
 router.delete('/:id',authenticate, deleteBlog);
