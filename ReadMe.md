@@ -1,10 +1,6 @@
-
----
-
-```markdown
 # 📝 MERN Blogging Platform
 
-A full-stack blogging platform built with the MERN stack (MongoDB, Express.js, React, Node.js). This project supports user authentication, blog creation/editing, and a clean modern frontend. Designed to be scalable and extendable.
+A full-stack blogging platform built with the MERN stack (MongoDB, Express.js, React, Node.js). This project supports user authentication, blog creation/editing, pagination, search, and more — with a clean modern frontend. Designed to be scalable and extendable.
 
 ---
 
@@ -12,10 +8,12 @@ A full-stack blogging platform built with the MERN stack (MongoDB, Express.js, R
 
 This project aims to create a fully functional blogging platform where users can:
 - Register and log in
-- Create, edit, and delete blog posts
+- Create, edit, soft-delete, and permanently delete blog posts
 - Read blog posts in a public feed
+- Search, sort, and paginate blogs
 - View individual post pages
 - Manage their own content via a dashboard
+- Automatically delete soft-deleted blogs after 30 days
 
 ---
 
@@ -27,47 +25,43 @@ This project aims to create a fully functional blogging platform where users can
 | **Backend**    | Node.js, Express        |
 | **Database**   | MongoDB, Mongoose       |
 | **Authentication** | JWT, bcrypt         |
-| **Styling**    | TailwindCSS (or Bootstrap) |
-| **Rich Text Editor** | react-quill / react-mde |
-| **Image Uploads** | Cloudinary (optional) |
-| **Deployment** | Vercel (frontend), Render or Heroku (backend) |
+| **Styling**    | TailwindCSS             |
+| **Image Handling** | URL-based image preview, Cloudinary (optional) |
+| **Validation** | Joi (Express middleware) |
+| **Deployment** | Vercel (frontend), Render (backend) |
 
 ---
 
 ## 🧠 Mind Map (Feature Outline)
 
 ```
-
 Blogging Platform
 │
 ├── 1. Authentication
 │   ├── Register / Login
 │   ├── JWT Token Auth
-│   ├── Forgot Password (optional)
 │   └── Role: Admin vs User (optional)
 │
 ├── 2. Users
 │   ├── Profile page
-│   ├── Avatar upload (optional)
-│   └── Edit bio / social links
+│   └── Edit bio / social links (optional)
 │
 ├── 3. Blog Posts
-│   ├── Create / Edit / Delete
+│   ├── Create / Edit / Delete (Soft Delete)
 │   ├── Markdown or Rich Text support
-│   ├── Featured Image
+│   ├── Cover Image (URL-based for now)
 │   ├── Tags / Categories
-│   ├── Slug-based URLs
-│   └── Publish / Draft modes
+│   ├── Publish / Draft modes
+│   ├── Pagination / Search / Sorting
+│   └── Permanent deletion after 30 days (cron job)
 │
 ├── 4. Comments (optional)
 │   ├── Add / delete comment
-│   ├── Nested replies
-│   └── Moderation or report (admin)
+│   └── Nested replies
 │
 ├── 5. Dashboard
 │   ├── My Posts
-│   ├── Edit Profile
-│   └── Analytics (views, likes – optional)
+│   └── Edit Profile
 │
 ├── 6. Admin Panel (optional)
 │   ├── Manage Users
@@ -78,22 +72,20 @@ Blogging Platform
 │   ├── Home Page – List of Posts
 │   ├── Post Detail Page
 │   ├── Search / Filter by tags
-│   ├── Pagination or Infinite Scroll
+│   ├── Pagination
 │   └── Mobile Responsive Design
 │
 ├── 8. Backend Features
 │   ├── RESTful API (Node + Express)
-│   ├── MongoDB Models
-│   ├── Error Handling Middleware
-│   └── Environment Configs
+│   ├── MongoDB Models with Timestamps
+│   ├── Joi Validation Middleware
+│   ├── Utility Functions (pagination, search, sorting)
+│   └── Scheduled Jobs (soft delete cleanup)
 │
 ├── 9. DevOps & Deployment
-│   ├── Git & GitHub (version control)
-│   ├── Environment Variables (.env)
-│   ├── Deployment: Vercel (frontend), Render/Heroku (backend)
-│   └── CI/CD pipeline (optional)
-
-
+│   ├── Git & GitHub
+│   ├── .env for secrets
+│   └── Deploy: Vercel / Render
 ```
 
 ---
@@ -102,28 +94,24 @@ Blogging Platform
 
 ### Backend
 ```
-
 blog-backend/
 ├── models/
 ├── routes/
 ├── controllers/
 ├── middleware/
-├── utils/
+├── utils/          # Pagination, Search, Cron Jobs
 └── server.js
-
 ```
 
 ### Frontend
 ```
-
 blog-frontend/
 ├── components/
 ├── pages/
-├── services/
-├── contexts/
+├── services/       # Axios API wrappers
+├── contexts/       # Auth context
 └── App.jsx
-
-````
+```
 
 ---
 
@@ -135,103 +123,69 @@ blog-frontend/
   username: String,
   email: String,
   password: String, // hashed
-  bio: String,
-  avatar: String,
   role: 'user' | 'admin',
   createdAt: Date
 }
-````
+```
 
-### Post
-
+### Blog
 ```js
 {
   title: String,
-  slug: String,
   content: String,
-  coverImage: String,
+  coverImage: String, // optional URL
   tags: [String],
+  isPublished: Boolean,
+  isDeleted: Boolean,
   author: ObjectId, // linked to User
-  status: 'published' | 'draft',
   createdAt: Date,
-  updatedAt: Date
-}
-```
-
-### Comment (optional)
-
-```js
-{
-  postId: ObjectId,
-  userId: ObjectId,
-  content: String,
-  parentCommentId: ObjectId, // for nested replies
-  createdAt: Date
+  updatedAt: Date,
+  deletedAt: Date // only if soft-deleted
 }
 ```
 
 ---
 
-## 🚧 Development Roadmap
+## 🚀 Features Implemented So Far
 
-### ✅ Step 1: Project Setup
-
-* [x] Initialize backend and frontend
-* [x] Connect MongoDB
-* [x] Set up basic routing and folder structure
-
-### 🛠 Step 2: Authentication
-
-* [ ] Register / Login with JWT
-* [ ] Secure routes using middleware
-
-### 📄 Step 3: Blog Post Features
-
-* [ ] Create, edit, delete posts
-* [ ] Display posts on homepage
-* [ ] Post detail page with full content
-
-### 🎨 Step 4: Frontend UI
-
-* [ ] Add responsive layout
-* [ ] Implement rich text editor
-* [ ] Add featured image support
-
-### 🔧 Step 5: Dashboard
-
-* [ ] User can view & manage own posts
-* [ ] Optional analytics panel
-
-### 💡 Optional Features
-
-* [ ] Comments system
-* [ ] Admin panel
-* [ ] SEO optimization
-* [ ] AI-generated summaries or tags
+- ✅ Register / Login with JWT auth
+- ✅ Blog model with `isPublished`, `isDeleted`, `coverImage`, `tags`
+- ✅ Create / Read / Update / Soft Delete blogs (author only)
+- ✅ Blog preview on homepage with title, image, tags, and short content
+- ✅ Show live image preview from URL on create/edit form
+- ✅ Public homepage shows only published + non-deleted blogs
+- ✅ Pagination, Search by title, Sorting by date/title
+- ✅ Reusable utility for pagination/search/filtering
+- ✅ Cron job deletes soft-deleted blogs after 30 days
 
 ---
 
-## 📦 Deployment (Production)
+## 🛣️ Roadmap (Next Steps)
 
-* Backend: Render / Heroku
-* Frontend: Vercel / Netlify
-* Environment variables via `.env`
+- [ ] Implement file/image upload using Cloudinary (optional)
+- [ ] User Dashboard to manage own posts
+- [ ] Post Detail Page
+- [ ] Like/Bookmark (optional)
+- [ ] Admin Panel (optional)
+- [ ] Add Comments (optional)
+- [ ] SEO, Sitemap, and Meta Tags
+
+---
+
+## 📦 Deployment
+
+- Backend: [Render](https://render.com/)
+- Frontend: [Vercel](https://vercel.com/)
+- Secrets managed with `.env` for both environments
 
 ---
 
 ## 🤝 Contributing
 
-This is a solo learning project, but PRs and feedback are welcome for future improvements.
+This is a solo learning project. Feedback and ideas are always welcome.
 
 ---
 
 ## 📜 License
 
 MIT License
-
-```
-
----
-
-Would you like this in a downloadable `.md` file? Or should we continue building Step 2: **User Authentication (backend models, routes, and controller logic)?**
-```
