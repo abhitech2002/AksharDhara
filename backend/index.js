@@ -3,6 +3,7 @@ import { configDotenv } from 'dotenv';
 import connectDB from './config/db.js';
 import blogRoutes from './routes/blogRoutes.js';
 import authRoutes from './routes/authRoutes.js';
+import userRoutes from "./routes/userRoutes.js"
 import cors from 'cors';
 import "./utils/cronJobs/deleteExpiredBlogs.js";
 
@@ -17,6 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/v1/blogs', blogRoutes);
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/users', userRoutes)
 
 connectDB().then(() => {
     app.listen(PORT, () => {

@@ -98,7 +98,7 @@ const getMyBlogs = async () => {
 
 const togglePublishBlog = async (blogId) => {
   try {
-    const response = await axios.patch(
+    const response = await axios.put(
       `${API_URL}${blogId}/toggle-publish`,
       {},
       getAuthHeaders()
