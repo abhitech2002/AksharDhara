@@ -35,7 +35,7 @@ export default function Navbar() {
             </Link>
           )}
           {user && (
-            <Link to="/profile" className="text-gray-700 hover:text-blue-600">
+            <Link to="/profile/view" className="text-gray-700 hover:text-blue-600">
             Profile
           </Link>
           )}
