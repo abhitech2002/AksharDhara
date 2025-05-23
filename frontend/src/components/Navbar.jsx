@@ -42,9 +42,9 @@ export default function Navbar() {
             </Link>
             {user && (
               <>
-                <Link to="/drafts" className="nav-link">
+                {/* <Link to="/drafts" className="nav-link">
                   Drafts
-                </Link>
+                </Link> */}
                 {/* <Link to="/dashboard" className="nav-link">
                   Dashboard
                 </Link> */}
