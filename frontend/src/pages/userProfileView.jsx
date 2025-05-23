@@ -71,7 +71,14 @@ export default function UserProfileView() {
       <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-sm overflow-hidden mb-8">
           {/* Header Section */}
-          <div className="relative h-48 bg-gradient-to-r from-blue-500 to-purple-600">
+          <div 
+            className="relative h-48 bg-gradient-to-r from-blue-500 to-purple-600"
+            style={{
+              backgroundImage: `url(${profile.data.coverImage || 'https://plus.unsplash.com/premium_photo-1725474189699-eed5435b8864?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHx0b3BpYy1mZWVkfDl8Ym84alFLVGFFMFl8fGVufDB8fHx8fA%3D%3D'})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+          >
             <div className="absolute -bottom-16 left-8">
               <img
                 src={profile.data.avatar || "/default-avatar.png"}
