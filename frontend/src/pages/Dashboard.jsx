@@ -61,18 +61,15 @@ export default function Dashboard() {
                     No Image
                   </div>
                 )}
-
                 {/* Title & Content */}
                 <h2 className="text-xl font-bold text-gray-900 mb-2">
                   {post.title || "Untitled"}
                 </h2>
-
                 <p className="text-sm text-gray-600 mb-3">
                   {post.content?.length > 100
                     ? post.content.substring(0, 100) + "..."
                     : post.content || "No content available"}
                 </p>
-
                 {/* Tags */}
                 <div className="flex flex-wrap gap-2 mb-4">
                   {post.tags?.map((tag, index) => (
@@ -84,8 +81,9 @@ export default function Dashboard() {
                     </span>
                   ))}
                 </div>
-
                 {/* Action Buttons */}
+                // Inside your map for each post card (replace the previous
+                footer inside the card)
                 <div className="mt-auto flex justify-end space-x-2">
                   <Link
                     to={`/posts/${post._id}`}
