@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { getUserProfile } from "../services/userService";
+import { getMyBlogs, togglePublishBlog } from "../services/blogService";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import {
@@ -18,19 +19,30 @@ import {
 export default function UserProfileView() {
   const { user } = useAuth();
   const [profile, setProfile] = useState(null);
+  const [myBlogs, setMyBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (user?.id) {
-      getUserProfile(user.id)
-        .then(setProfile)
+      Promise.all([
+        getUserProfile(user.id),
+        getMyBlogs()
+      ])
+        .then(([profileData, blogsData]) => {
+          setProfile(profileData);
+          setMyBlogs(blogsData || []);
+        })
         .catch((err) => {
-          console.error("Failed to load profile", err);
+          console.error("Failed to load data", err);
+        })
+        .finally(() => {
+          setLoading(false);
         });
     }
   }, [user]);
 
-  if (!profile) {
+  if (!profile || loading) {
     return (
       <>
         <Navbar />
@@ -53,7 +65,7 @@ export default function UserProfileView() {
     <>
       <Navbar />
       <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-sm overflow-hidden mb-8">
           {/* Header Section */}
           <div className="relative h-48 bg-gradient-to-r from-blue-500 to-purple-600">
             <div className="absolute -bottom-16 left-8">
@@ -182,6 +194,88 @@ export default function UserProfileView() {
           </div>
         </div>
       </div>
+
+        {/* Blog Posts Section */}
+        <div className="max-w-6xl mx-auto mt-12">
+          <h2 className="text-2xl font-bold text-gray-800 mb-8">Blog Posts</h2>
+          
+          {myBlogs.length === 0 ? (
+            <p className="text-gray-600 text-center">No blog posts found.</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-5">
+              {myBlogs.map((post) => (
+                <div
+                  key={post._id}
+                  className="bg-white rounded-xl shadow-md hover:shadow-lg transition p-5 flex flex-col"
+                >
+                  {/* Cover Image */}
+                  {post.coverImage ? (
+                    <img
+                      src={post.coverImage}
+                      alt="Cover"
+                      className="h-40 w-full object-cover rounded-md mb-4"
+                    />
+                  ) : (
+                    <div className="h-40 w-full bg-gray-200 flex items-center justify-center rounded-md text-gray-500 text-sm mb-4">
+                      No Image
+                    </div>
+                  )}
+                  {/* Title & Content */}
+                  <h2 className="text-xl font-bold text-gray-900 mb-2">
+                    {post.title || "Untitled"}
+                  </h2>
+                  <p className="text-sm text-gray-600 mb-3">
+                    {post.content?.length > 100
+                      ? post.content.substring(0, 100) + "..."
+                      : post.content || "No content available"}
+                  </p>
+                  {/* Tags */}
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {post.tags?.map((tag, index) => (
+                      <span
+                        key={index}
+                        className="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded"
+                      >
+                        #{tag}
+                      </span>
+                    ))}                    
+                  </div>
+                  {/* View Button and Status Toggle */}
+                  <div className="mt-auto flex justify-between items-center">
+                    <button
+                      onClick={() => navigate(`/posts/${post._id}`)}
+                      className="text-sm text-blue-600 hover:underline"
+                    >
+                      Read More
+                    </button>
+                    <button
+                      onClick={async () => {
+                        try {
+                          const updated = await togglePublishBlog(post._id, !post.isPublished);
+                          setMyBlogs((prev) =>
+                            prev.map((blog) =>
+                              blog._id === post._id ? { ...blog, isPublished: updated.isPublished } : blog
+                            )
+                          );
+                        } catch (error) {
+                          console.error("Failed to toggle post status:", error);
+                          alert("Could not update post status.");
+                        }
+                      }}
+                      className={`text-sm ${
+                        post.isPublished 
+                          ? "text-gray-500 hover:bg-gray-200" 
+                          : "text-green-600 hover:bg-green-50"
+                      } px-2 py-1 rounded transition-colors`}
+                    >
+                      {post.isPublished ? "Mark as Draft" : "Publish"}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
     </>
   );
 }

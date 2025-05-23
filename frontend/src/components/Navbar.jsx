@@ -45,9 +45,9 @@ export default function Navbar() {
                 <Link to="/drafts" className="nav-link">
                   Drafts
                 </Link>
-                <Link to="/dashboard" className="nav-link">
+                {/* <Link to="/dashboard" className="nav-link">
                   Dashboard
-                </Link>
+                </Link> */}
                 <Link to="/profile/view" className="nav-link">
                   Profile
                 </Link>
