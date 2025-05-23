@@ -1,10 +1,21 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode"; 
+import { getUserProfile } from "../services/userService"
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({children}) => {
     const [user, setUser] = useState(null);
+
+    const refreshUser = async () => {
+        try {
+          const data = await getUserProfile();
+          setUser(data);
+        } catch (err) {
+          console.error("Failed to fetch user profile", err);
+          logout();
+        }
+      };
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -31,7 +42,7 @@ export const AuthProvider = ({children}) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout }}>{children}</AuthContext.Provider>
+        <AuthContext.Provider value={{ user, login, logout, refreshUser }}>{children}</AuthContext.Provider>
     );
 }
 

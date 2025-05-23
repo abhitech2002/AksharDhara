@@ -2,11 +2,26 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { getMyBlogs } from "../services/blogService";
+import { getMyBlogs, togglePublishBlog } from "../services/blogService";
 
 export default function Dashboard() {
   const [myBlogs, setMyBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const handleStatusToggle = async (postId, currentStatus) => {
+    try {
+      const updated = await togglePublishBlog(postId, !currentStatus);
+      setMyBlogs((prev) =>
+        prev.map((blog) =>
+          blog._id === postId ? { ...blog, isPublished: updated.isPublished } : blog
+        )
+      );
+    } catch (error) {
+      console.error("Status update failed:", error);
+      alert("Could not update post status.");
+    }
+  };
+  
 
   useEffect(() => {
     const fetchMyBlogs = async () => {
@@ -82,8 +97,6 @@ export default function Dashboard() {
                   ))}
                 </div>
                 {/* Action Buttons */}
-                // Inside your map for each post card (replace the previous
-                footer inside the card)
                 <div className="mt-auto flex justify-end space-x-2">
                   <Link
                     to={`/posts/${post._id}`}
@@ -98,6 +111,22 @@ export default function Dashboard() {
                     Edit
                   </Link>
                 </div>
+                <button
+                  onClick={async () => {
+                    await handleStatusToggle(post._id, post.isPublished);
+                    if (!post.isPublished) {
+                      const blogs = await getMyBlogs();
+                      setMyBlogs(blogs || []);
+                    }
+                  }}
+                  className={`text-sm ${
+                    post.isPublished 
+                      ? "text-gray-500 hover:bg-gray-200" 
+                      : "text-green-600 hover:bg-green-50"
+                  } px-2 py-1 rounded transition-colors`}
+                >
+                  {post.isPublished ? "Mark as Draft" : "Publish"}
+                </button>
               </div>
             ))}
           </div>
