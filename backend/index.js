@@ -8,14 +8,22 @@ import authRoutes from './routes/authRoutes.js';
 import userRoutes from "./routes/userRoutes.js"
 import cors from 'cors';
 import "./utils/cronJobs/deleteExpiredBlogs.js";
+import helmet from 'helmet'
 
 configDotenv();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors({ origin: 'http://localhost:5173' }));
-app.use(express.json());
+app.use(helmet())
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  maxAge: 86400 // 24 hours
+}));
+app.use(express.json({limit: '10kb'}));
 app.use(express.urlencoded({ extended: true }));
 
 // Add request logging middleware before routes
