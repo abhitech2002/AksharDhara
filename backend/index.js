@@ -1,4 +1,6 @@
 import express from 'express';
+import { requestLogger } from './middlewares/requestLogger.js';
+import { logger } from './config/logger.js';
 import { configDotenv } from 'dotenv';
 import connectDB from './config/db.js';
 import blogRoutes from './routes/blogRoutes.js';
@@ -15,6 +17,23 @@ const PORT = process.env.PORT || 3000;
 app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Add request logging middleware before routes
+app.use(requestLogger);
+
+// Global error handler
+app.use((err, req, res, next) => {
+  logger.error('Unhandled Error:', {
+    error: err.message,
+    stack: err.stack,
+    url: req.url,
+    method: req.method
+  });
+  
+  res.status(500).json({
+    message: 'Internal Server Error'
+  });
+});
 
 app.use('/api/v1/blogs', blogRoutes);
 app.use('/api/v1/auth', authRoutes);
