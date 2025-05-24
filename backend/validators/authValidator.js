@@ -17,8 +17,7 @@ export const validatePassword = (password) => {
 export const registerSchema = joi.object({
   username: joi.string().min(3).max(30).required(),
   email: joi.string().email().required(),
-  password: joi.string().min(8).required(),
-  confirmPassword: joi.string().valid(joi.ref('password')).required(),
+  password: joi.string().min(8).required()
 })
 
 export const loginSchema = joi.object({

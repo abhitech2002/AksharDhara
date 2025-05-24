@@ -7,6 +7,6 @@ import { validate } from '../middlewares/validate.js';
 const router = express.Router()
 
 router.get('/profile', authenticate, getUser)
-router.put('/profile', authenticate, validate(updateProfileSchema), updateUserProfile)
+router.put('/profile', authenticate, updateUserProfile)
 
 export default router; 
