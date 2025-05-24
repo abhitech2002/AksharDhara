@@ -12,16 +12,17 @@ import {
 import { authenticate } from '../middlewares/authMiddleware.js';
 import { createBlogSchema, updateBlogSchema, togglePublishSchema } from "../validators/blogValidator.js";
 import { validate } from '../middlewares/validate.js';
+import { apiLimiter, createBlogLimiter } from '../middlewares/rateLimiter.js';
 
 const router = express.Router();
 
-router.post('/', authenticate, validate(createBlogSchema), createBlog);
-router.get('/', getBlogs);
-router.get('/drafts', authenticate, getUserDrafts);
-router.get('/my-blogs', authenticate, getMyBlogs);
-router.put('/:id/toggle-publish', authenticate, validate(togglePublishSchema), togglePublishStatus);
-router.get('/:id', getBlogById);
-router.put('/:id', authenticate, validate(updateBlogSchema), updateBlog);
-router.delete('/:id', authenticate, deleteBlog);
+router.post('/', authenticate, createBlogLimiter, validate(createBlogSchema), createBlog);
+router.get('/', apiLimiter, getBlogs);
+router.get('/drafts', apiLimiter, authenticate, getUserDrafts);
+router.get('/my-blogs', apiLimiter, authenticate, getMyBlogs);
+router.put('/:id/toggle-publish', apiLimiter, authenticate, validate(togglePublishSchema), togglePublishStatus);
+router.get('/:id', apiLimiter, getBlogById);
+router.put('/:id', apiLimiter, authenticate, validate(updateBlogSchema), updateBlog);
+router.delete('/:id', apiLimiter, authenticate, deleteBlog);
 
 export default router;
