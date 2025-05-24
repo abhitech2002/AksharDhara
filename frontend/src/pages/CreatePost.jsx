@@ -4,6 +4,8 @@ import { createBlog } from "../services/blogService";
 import { marked } from "marked";
 import DOMPurify from "dompurify";
 import CreatableSelect from "react-select/creatable";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 const predefinedTags = [
   { label: "React", value: "react" },
@@ -17,6 +19,21 @@ const predefinedTags = [
   { label: "Backend", value: "backend" },
 ];
 
+const formats = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "strike",
+  "list",
+  "bullet",
+  "color",
+  "background",
+  "align",
+  "link",
+  "image",
+];
+
 function CreatePost() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -27,6 +44,18 @@ function CreatePost() {
   const [imgValid, setImgValid] = useState(false);
 
   const maxContentLength = 2000;
+
+  const modules = {
+    toolbar: [
+      [{ header: [1, 2, 3, 4, 5, 6, false] }],
+      ["bold", "italic", "underline", "strike"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      [{ color: [] }, { background: [] }],
+      [{ align: [] }],
+      ["link", "image"],
+      ["clean"],
+    ],
+  };
 
   const navigate = useNavigate();
 
@@ -191,15 +220,17 @@ function CreatePost() {
               required
             />
             <div>
-              <textarea
-                placeholder="Content"
-                // placeholder="Content (Markdown supported)"
-                className="w-full px-5 py-4 text-lg border border-gray-300 rounded-lg shadow-sm h-48 resize-y focus:outline-none transition"
+              <ReactQuill
+                theme="snow"
                 value={content}
+                onChange={setContent}
+                modules={modules}
+                formats={formats}
+                placeholder="Write your story..."
+                className="h-64 mb-10"
                 maxLength={maxContentLength}
-                onChange={(e) => setContent(e.target.value)}
-                required
-              ></textarea>
+              />
+            
               <div className="char-counter">
                 {content.length} / {maxContentLength}
               </div>
