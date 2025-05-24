@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { getUserProfile } from "../services/userService";
-import { getMyBlogs, togglePublishBlog, getUserDrafts } from "../services/blogService";
+import {
+  getMyBlogs,
+  togglePublishBlog,
+  getUserDrafts,
+} from "../services/blogService";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import {
@@ -15,23 +19,26 @@ import {
   FaGlobe,
   FaInstagram,
 } from "react-icons/fa";
+import DOMPurify from "dompurify";
 
 export default function UserProfileView() {
   const { user } = useAuth();
   const [profile, setProfile] = useState(null);
   const [myBlogs, setMyBlogs] = useState([]);
   const [drafts, setDrafts] = useState([]);
-  const [activeTab, setActiveTab] = useState('posts');
+  const [activeTab, setActiveTab] = useState("posts");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  const createMarkup = (html) => {
+    return {
+      __html: DOMPurify.sanitize(html),
+    };
+  };
+
   useEffect(() => {
     if (user?.id) {
-      Promise.all([
-        getUserProfile(user.id),
-        getMyBlogs(),
-        getUserDrafts()
-      ])
+      Promise.all([getUserProfile(user.id), getMyBlogs(), getUserDrafts()])
         .then(([profileData, blogsData, draftsData]) => {
           setProfile(profileData);
           setMyBlogs(blogsData || []);
@@ -71,12 +78,15 @@ export default function UserProfileView() {
       <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-sm overflow-hidden mb-8">
           {/* Header Section */}
-          <div 
+          <div
             className="relative h-48 bg-gradient-to-r from-blue-500 to-purple-600"
             style={{
-              backgroundImage: `url(${profile.data.coverImage || 'https://plus.unsplash.com/premium_photo-1725474189699-eed5435b8864?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHx0b3BpYy1mZWVkfDl8Ym84alFLVGFFMFl8fGVufDB8fHx8fA%3D%3D'})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center'
+              backgroundImage: `url(${
+                profile.data.coverImage ||
+                "https://plus.unsplash.com/premium_photo-1725474189699-eed5435b8864?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHx0b3BpYy1mZWVkfDl8Ym84alFLVGFFMFl8fGVufDB8fHx8fA%3D%3D"
+              })`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
             }}
           >
             <div className="absolute -bottom-16 left-8">
@@ -206,187 +216,217 @@ export default function UserProfileView() {
         </div>
       </div>
 
-        {/* Blog Posts Section */}
-        <div className="max-w-6xl mx-auto mt-12">
-          <div className="flex justify-center space-x-8 mb-8">
-            <button
-              onClick={() => setActiveTab('posts')}
-              className={`text-xl font-semibold pb-2 ${activeTab === 'posts' 
-                ? 'text-indigo-600 border-b-2 border-indigo-600' 
-                : 'text-gray-500 hover:text-gray-700'}`}
-            >
-              Blog Posts
-            </button>
-            <button
-              onClick={() => setActiveTab('drafts')}
-              className={`text-xl font-semibold pb-2 ${activeTab === 'drafts' 
-                ? 'text-indigo-600 border-b-2 border-indigo-600' 
-                : 'text-gray-500 hover:text-gray-700'}`}
-            >
-              Drafts
-            </button>
-          </div>
-
-          {/* Blog Posts Tab */}
-          {activeTab === 'posts' && (
-            <div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-8">Blog Posts</h2>
-              {myBlogs.length === 0 ? (
-                <p className="text-gray-600 text-center">No blog posts found.</p>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-5">
-                  {myBlogs.map((post) => (
-                    <div
-                      key={post._id}
-                      className="bg-white rounded-xl shadow-md hover:shadow-lg transition p-5 flex flex-col"
-                    >
-                      {/* Cover Image */}
-                      {post.coverImage ? (
-                        <img
-                          src={post.coverImage}
-                          alt="Cover"
-                          className="h-40 w-full object-cover rounded-md mb-4"
-                        />
-                      ) : (
-                        <div className="h-40 w-full bg-gray-200 flex items-center justify-center rounded-md text-gray-500 text-sm mb-4">
-                          No Image
-                        </div>
-                      )}
-                      {/* Title & Content */}
-                      <h2 className="text-xl font-bold text-gray-900 mb-2">
-                        {post.title || "Untitled"}
-                      </h2>
-                      <p className="text-sm text-gray-600 mb-3">
-                        {post.content?.length > 100
-                          ? post.content.substring(0, 100) + "..."
-                          : post.content || "No content available"}
-                      </p>
-                      {/* Tags */}
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {post.tags?.map((tag, index) => (
-                          <span
-                            key={index}
-                            className="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded"
-                          >
-                            #{tag}
-                          </span>
-                        ))}                    
-                      </div>
-                      {/* View Button and Status Toggle */}
-                      <div className="mt-auto flex justify-between items-center">
-                        <button
-                          onClick={() => navigate(`/posts/${post._id}`)}
-                          className="text-sm text-blue-600 hover:underline"
-                        >
-                          Read More
-                        </button>
-                        <button
-                          onClick={async () => {
-                            try {
-                              const updated = await togglePublishBlog(post._id, !post.isPublished);
-                              setMyBlogs((prev) =>
-                                prev.map((blog) =>
-                                  blog._id === post._id ? { ...blog, isPublished: updated.isPublished } : blog
-                                )
-                              );
-                            } catch (error) {
-                              console.error("Failed to toggle post status:", error);
-                              alert("Could not update post status.");
-                            }
-                          }}
-                          className={`text-sm ${
-                            post.isPublished 
-                              ? "text-gray-500 hover:bg-gray-200" 
-                              : "text-green-600 hover:bg-green-50"
-                          } px-2 py-1 rounded transition-colors`}
-                        >
-                          {post.isPublished ? "Mark as Draft" : "Publish"}
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Drafts Tab */}
-          {activeTab === 'drafts' && (
-            <div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-8">Your Drafts</h2>
-              {drafts.length === 0 ? (
-                <p className="text-center text-gray-600 text-xl mb-5">
-                  You have no drafts yet.{" "}
-                  <Link
-                    to="/create"
-                    className="text-indigo-600 font-semibold hover:underline hover:text-indigo-800 transition"
-                  >
-                    Create one now!
-                  </Link>
-                </p>
-              ) : (
-                <div className="grid gap-10 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mb-5">
-                  {drafts.map((draft) => (
-                    <div
-                      key={draft._id}
-                      className="flex flex-col bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-shadow duration-300 border border-gray-200"
-                    >
-                      {draft.coverImage ? (
-                        <div className="overflow-hidden rounded-t-3xl h-48">
-                          <img
-                            src={draft.coverImage}
-                            alt="Cover"
-                            className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
-                          />
-                        </div>
-                      ) : (
-                        <div className="h-48 bg-indigo-100 rounded-t-3xl flex items-center justify-center text-indigo-400 font-semibold text-lg">
-                          No Image
-                        </div>
-                      )}
-
-                      <div className="p-6 flex flex-col flex-grow">
-                        <h2 className="text-2xl font-bold text-indigo-900 mb-3 truncate">
-                          {draft.title || "Untitled Draft"}
-                        </h2>
-
-                        <p className="text-sm text-gray-500 mb-5">
-                          Created on{" "}
-                          <time dateTime={draft.createdAt}>
-                            {new Date(draft.createdAt).toLocaleDateString()}
-                          </time>
-                        </p>
-
-                        <div className="flex flex-wrap gap-3 mb-6">
-                          {draft.tags?.length > 0 ? (
-                            draft.tags.map((tag, idx) => (
-                              <span
-                                key={idx}
-                                className="bg-indigo-100 text-indigo-700 text-xs font-semibold px-3 py-1 rounded-full select-none"
-                              >
-                                #{tag}
-                              </span>
-                            ))
-                          ) : (
-                            <span className="text-gray-400 italic text-xs">No tags</span>
-                          )}
-                        </div>
-
-                        <Link
-                          to={`/edit/${draft._id}`}
-                          className="mt-auto inline-block text-center bg-indigo-600 text-white font-semibold rounded-full px-6 py-3 hover:bg-indigo-700 transition"
-                          aria-label={`Edit draft titled ${draft.title}`}
-                        >
-                          ✎ Edit Draft
-                        </Link>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+      {/* Blog Posts Section */}
+      <div className="max-w-6xl mx-auto mt-12">
+        <div className="flex justify-center space-x-8 mb-8">
+          <button
+            onClick={() => setActiveTab("posts")}
+            className={`text-xl font-semibold pb-2 ${
+              activeTab === "posts"
+                ? "text-indigo-600 border-b-2 border-indigo-600"
+                : "text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            Blog Posts
+          </button>
+          <button
+            onClick={() => setActiveTab("drafts")}
+            className={`text-xl font-semibold pb-2 ${
+              activeTab === "drafts"
+                ? "text-indigo-600 border-b-2 border-indigo-600"
+                : "text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            Drafts
+          </button>
         </div>
+
+        {/* Blog Posts Tab */}
+        {activeTab === "posts" && (
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-8">
+              Blog Posts
+            </h2>
+            {myBlogs.length === 0 ? (
+              <p className="text-gray-600 text-center">No blog posts found.</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-5">
+                {myBlogs.map((post) => (
+                  <div
+                    key={post._id}
+                    className="bg-white rounded-xl shadow-md hover:shadow-lg transition p-5 flex flex-col"
+                  >
+                    {/* Cover Image */}
+                    {post.coverImage ? (
+                      <img
+                        src={post.coverImage}
+                        alt="Cover"
+                        className="h-40 w-full object-cover rounded-md mb-4"
+                      />
+                    ) : (
+                      <div className="h-40 w-full bg-gray-200 flex items-center justify-center rounded-md text-gray-500 text-sm mb-4">
+                        No Image
+                      </div>
+                    )}
+                    {/* Title & Content */}
+                    <h2 className="text-xl font-bold text-gray-900 mb-2">
+                      {post.title || "Untitled"}
+                    </h2>
+                    <div
+                      className="prose prose-sm prose-gray mb-4 overflow-hidden"
+                      style={{
+                        maxHeight: "3.6em",
+                        WebkitLineClamp: 2,
+                        display: "-webkit-box",
+                        WebkitBoxOrient: "vertical",
+                      }}
+                      dangerouslySetInnerHTML={createMarkup(
+                        (post.content).length > 120
+                          ? (post.content).substring(0, 120) + "..."
+                          : (post.content)
+                      )}
+                    />
+                    {/* Tags */}
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {post.tags?.map((tag, index) => (
+                        <span
+                          key={index}
+                          className="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded"
+                        >
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                    {/* View Button and Status Toggle */}
+                    <div className="mt-auto flex justify-between items-center">
+                      <button
+                        onClick={() => navigate(`/posts/${post._id}`)}
+                        className="text-sm text-blue-600 hover:underline"
+                      >
+                        Read More
+                      </button>
+                      <button
+                        onClick={async () => {
+                          try {
+                            const updated = await togglePublishBlog(
+                              post._id,
+                              !post.isPublished
+                            );
+                            setMyBlogs((prev) =>
+                              prev.map((blog) =>
+                                blog._id === post._id
+                                  ? {
+                                      ...blog,
+                                      isPublished: updated.isPublished,
+                                    }
+                                  : blog
+                              )
+                            );
+                          } catch (error) {
+                            console.error(
+                              "Failed to toggle post status:",
+                              error
+                            );
+                            alert("Could not update post status.");
+                          }
+                        }}
+                        className={`text-sm ${
+                          post.isPublished
+                            ? "text-gray-500 hover:bg-gray-200"
+                            : "text-green-600 hover:bg-green-50"
+                        } px-2 py-1 rounded transition-colors`}
+                      >
+                        {post.isPublished ? "Mark as Draft" : "Publish"}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Drafts Tab */}
+        {activeTab === "drafts" && (
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-8">
+              Your Drafts
+            </h2>
+            {drafts.length === 0 ? (
+              <p className="text-center text-gray-600 text-xl mb-5">
+                You have no drafts yet.{" "}
+                <Link
+                  to="/create"
+                  className="text-indigo-600 font-semibold hover:underline hover:text-indigo-800 transition"
+                >
+                  Create one now!
+                </Link>
+              </p>
+            ) : (
+              <div className="grid gap-10 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mb-5">
+                {drafts.map((draft) => (
+                  <div
+                    key={draft._id}
+                    className="flex flex-col bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-shadow duration-300 border border-gray-200"
+                  >
+                    {draft.coverImage ? (
+                      <div className="overflow-hidden rounded-t-3xl h-48">
+                        <img
+                          src={draft.coverImage}
+                          alt="Cover"
+                          className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    ) : (
+                      <div className="h-48 bg-indigo-100 rounded-t-3xl flex items-center justify-center text-indigo-400 font-semibold text-lg">
+                        No Image
+                      </div>
+                    )}
+
+                    <div className="p-6 flex flex-col flex-grow">
+                      <h2 className="text-2xl font-bold text-indigo-900 mb-3 truncate">
+                        {draft.title || "Untitled Draft"}
+                      </h2>
+
+                      <p className="text-sm text-gray-500 mb-5">
+                        Created on{" "}
+                        <time dateTime={draft.createdAt}>
+                          {new Date(draft.createdAt).toLocaleDateString()}
+                        </time>
+                      </p>
+
+                      <div className="flex flex-wrap gap-3 mb-6">
+                        {draft.tags?.length > 0 ? (
+                          draft.tags.map((tag, idx) => (
+                            <span
+                              key={idx}
+                              className="bg-indigo-100 text-indigo-700 text-xs font-semibold px-3 py-1 rounded-full select-none"
+                            >
+                              #{tag}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-gray-400 italic text-xs">
+                            No tags
+                          </span>
+                        )}
+                      </div>
+
+                      <Link
+                        to={`/edit/${draft._id}`}
+                        className="mt-auto inline-block text-center bg-indigo-600 text-white font-semibold rounded-full px-6 py-3 hover:bg-indigo-700 transition"
+                        aria-label={`Edit draft titled ${draft.title}`}
+                      >
+                        ✎ Edit Draft
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
       {/* </div> */}
     </>
   );

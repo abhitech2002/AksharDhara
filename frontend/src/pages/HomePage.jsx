@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { getBlogs } from "../services/blogService";
+import DOMPurify from "dompurify";
 
 export default function HomePage() {
   const [posts, setPosts] = useState([]);
@@ -12,6 +13,17 @@ export default function HomePage() {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState("desc");
+
+  const createMarkup = (html) => {
+    return {
+      __html: DOMPurify.sanitize(html),
+    };
+  };
+
+  const stripHtml = (html) => {
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    return doc.body.textContent || "";
+  };
 
   const fetchBlogs = async () => {
     setLoading(true);
@@ -69,8 +81,18 @@ export default function HomePage() {
                   placeholder="Search blog title, tags..."
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
-                <svg className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                <svg
+                  className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
                 </svg>
               </div>
             </div>
@@ -90,7 +112,10 @@ export default function HomePage() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             {[1, 2, 3, 4, 5, 6].map((n) => (
-              <div key={n} className="bg-white rounded-2xl shadow-md p-4 animate-pulse">
+              <div
+                key={n}
+                className="bg-white rounded-2xl shadow-md p-4 animate-pulse"
+              >
                 <div className="h-48 bg-gray-200 rounded-lg mb-4"></div>
                 <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
                 <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
@@ -124,7 +149,7 @@ export default function HomePage() {
                     </h2>
                     <p className="text-sm text-gray-500 mb-3 flex items-center gap-2">
                       <span className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-medium">
-                        {post.author?.username?.charAt(0).toUpperCase() || '?'}
+                        {post.author?.username?.charAt(0).toUpperCase() || "?"}
                       </span>
                       <span>{post.author?.username}</span>
                       <span>•</span>
@@ -144,12 +169,12 @@ export default function HomePage() {
                       ))}
                     </div>
 
-                    <p className="text-gray-700 mb-4 text-sm leading-relaxed">
-                      {post.content.length > 120
-                        ? post.content.substring(0, 120) + "..."
-                        : post.content}
-                    </p>
-
+                    <div
+                      className="prose prose-blue max-w-none prose-img:rounded-xl prose-headings:text-indigo-900 prose-a:text-blue-600"
+                      dangerouslySetInnerHTML={createMarkup(stripHtml(post.content).length > 120
+                        ? (post.content).substring(0, 120) + '...'
+                        : (post.content))}
+                    />
                     <Link
                       to={`/posts/${post._id}`}
                       className="mt-auto inline-block text-blue-600 hover:underline text-sm"
@@ -174,7 +199,9 @@ export default function HomePage() {
                 Page {page} of {totalPages}
               </span>
               <button
-                onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+                onClick={() =>
+                  setPage((prev) => Math.min(prev + 1, totalPages))
+                }
                 disabled={page === totalPages}
                 className="px-4 py-2 bg-gray-200 rounded-md disabled:opacity-50"
               >

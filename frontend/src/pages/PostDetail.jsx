@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { getBlogById, deleteBlog } from "../services/blogService";
 import { jwtDecode } from "jwt-decode";
+import DOMPurify from 'dompurify';
 
 export default function PostDetail() {
   const { id } = useParams();
@@ -10,6 +11,12 @@ export default function PostDetail() {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState(null);
+
+  const createMarkup = (html) => {
+    return {
+      __html: DOMPurify.sanitize(html)
+    };
+  };
 
   // Get current user from JWT
   useEffect(() => {
@@ -146,9 +153,11 @@ export default function PostDetail() {
                   #{tag}
                 </span>
               ))}
-            </div>
-
-            <div className="prose prose-blue max-w-none">{post.content}</div>
+            </div>           
+            <div 
+              className="prose prose-blue max-w-none prose-img:rounded-xl prose-headings:text-indigo-900 prose-a:text-blue-600"
+              dangerouslySetInnerHTML={createMarkup(post.content)}
+            />
           </div>
         </article>
       </div>
