@@ -89,8 +89,17 @@ const CommentSection = ({ blogId }) => {
   };
 
   const handleDelete = async (id) => {
-    await deleteComment(id);
-    loadComments();
+    try {
+      await deleteComment(id);
+      loadComments();
+    } catch (error) {
+      if (error.response?.status === 404) {
+        loadComments(); // Refresh the comments list to sync with server
+      } else {
+        console.error('Error deleting comment:', error);
+        // Optionally show an error message to the user
+      }
+    }
   };
 
   return (

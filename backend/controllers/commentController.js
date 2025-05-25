@@ -53,7 +53,7 @@ export const getCommentsByBlogs = async (req, res) => {
 }
 
 export const deleteComment = async (req, res) => {
-    const commentId = req.params.commentId;
+    const commentId = req.params.id;
 
     try {
         const comment = await Comment.findById(commentId);

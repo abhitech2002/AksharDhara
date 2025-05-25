@@ -22,6 +22,7 @@ const getCommentsByBlogs = async (blogId) => {
 }
 
 const deleteComment = async (commentId) => {
+    console.log(commentId)
     const response = await axios.delete(API_URL + commentId, getAuthHeaders());
     return response.data;
 }

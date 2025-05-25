@@ -76,7 +76,7 @@ const CommentItem = ({
               Reply
             </button>
           )}
-          {user?._id === comment.author._id && (
+          {user?.id === comment.author?._id && ( 
             <button
               onClick={() => onDelete(comment._id)}
               className="text-sm text-red-500 hover:text-red-600 font-medium flex items-center gap-1 transition-colors duration-200"
