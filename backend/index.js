@@ -6,6 +6,7 @@ import connectDB from './config/db.js';
 import blogRoutes from './routes/blogRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from "./routes/userRoutes.js"
+import commentRoutes from "./routes/commentRoutes.js"
 import cors from 'cors';
 import "./utils/cronJobs/deleteExpiredBlogs.js";
 import helmet from 'helmet'
@@ -46,6 +47,7 @@ app.use((err, req, res, next) => {
 app.use('/api/v1/blogs', blogRoutes);
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes)
+app.use('/api/v1/comments', commentRoutes)
 
 connectDB().then(() => {
     app.listen(PORT, () => {

@@ -1,5 +1,5 @@
 import Comment from "../models/Comment.js";
-import logger from "../config/logger.js"; 
+import {logger} from "../config/logger.js"; 
 
 // Create a new comment
 export const createComment = async (req, res) => {
