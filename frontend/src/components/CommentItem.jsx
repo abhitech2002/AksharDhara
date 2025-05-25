@@ -10,6 +10,7 @@ const CommentItem = ({
 }) => {
   const [showReplyBox, setShowReplyBox] = useState(false);
   const [replyText, setReplyText] = useState("");
+  const [isCollapsed, setIsCollapsed] = useState(true); // Changed to true for default collapsed state
 
   const handleReplySubmit = async (e) => {
     e.preventDefault();
@@ -37,6 +38,8 @@ const CommentItem = ({
       console.error("Error submitting reply:", error);
     }
   };
+
+  const hasReplies = comment.replies && comment.replies.length > 0;
 
   return (
     <div className="ml-6 border-l-2 border-gray-100 pl-6 mt-4 relative before:absolute before:w-4 before:h-4 before:bg-blue-50 before:rounded-full before:-left-2 before:top-0 before:border-2 before:border-blue-200">
@@ -84,6 +87,22 @@ const CommentItem = ({
               Delete
             </button>
           )}
+          {hasReplies && (
+            <button
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="text-sm text-gray-600 hover:text-gray-800 font-medium flex items-center gap-1 transition-colors duration-200"
+            >
+              <svg 
+                className={`w-4 h-4 transform transition-transform duration-200 ${isCollapsed ? '' : 'rotate-180'}`}
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+              {isCollapsed ? `Show ${comment.replies.length} ${comment.replies.length === 1 ? 'reply' : 'replies'}` : 'Hide replies'}
+            </button>
+          )}
         </div>
 
         {showReplyBox && (
@@ -113,7 +132,7 @@ const CommentItem = ({
         )}
       </div>
 
-      <div className="space-y-4">
+      <div className={`space-y-4 overflow-hidden transition-all duration-300 ease-in-out ${isCollapsed ? 'max-h-0 opacity-0' : 'max-h-[9999px] opacity-100'}`}>
         {comment.replies?.map((reply) => (
           <CommentItem
             key={reply._id}
