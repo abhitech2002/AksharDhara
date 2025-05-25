@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { getBlogById, deleteBlog } from "../services/blogService";
 import { jwtDecode } from "jwt-decode";
 import DOMPurify from 'dompurify';
+import CommentSection from "../components/CommentSection";
 
 export default function PostDetail() {
   const { id } = useParams();
@@ -160,6 +161,9 @@ export default function PostDetail() {
             />
           </div>
         </article>
+        <div className="mt-8">
+          <CommentSection blogId={post._id} />
+        </div>
       </div>
     </div>
   );
