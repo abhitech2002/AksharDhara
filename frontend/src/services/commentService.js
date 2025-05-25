@@ -12,6 +12,8 @@ const getAuthHeaders = () => {
   };
 
 const createComment = async (commentData) => {
+  console.log(commentData);
+    // const token = localStorage.getItem("token");
     const response = await axios.post(API_URL + "create", commentData, getAuthHeaders());
     return response.data;
 };
