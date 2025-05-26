@@ -4,6 +4,7 @@ import { getBlogById, deleteBlog } from "../services/blogService";
 import { jwtDecode } from "jwt-decode";
 import DOMPurify from 'dompurify';
 import CommentSection from "../components/CommentSection";
+import BlogReaction from "../components/BlogReaction"; // Add this import
 
 export default function PostDetail() {
   const { id } = useParams();
@@ -164,6 +165,15 @@ export default function PostDetail() {
               className="prose prose-blue max-w-none prose-img:rounded-xl prose-headings:text-indigo-900 prose-a:text-blue-600"
               dangerouslySetInnerHTML={createMarkup(post.content)}
             />
+            
+            {/* Add BlogReaction component here */}
+            <div className="mt-6 border-t pt-6">
+              <BlogReaction 
+                blogId={post._id}
+                currentUserReaction={post.userReaction}
+                reactionCounts={post.reactions || {}}
+              />
+            </div>
           </div>
         </article>
         <div className="mt-8">
