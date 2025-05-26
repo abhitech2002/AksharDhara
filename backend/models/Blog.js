@@ -31,6 +31,11 @@ const blogSchema = new mongoose.Schema({
     type: Boolean, 
     default: false
  },
+ reactions: {
+  type: Map,
+  of: [String],
+  default: {}
+ }
 }, { timestamps: true });
 
 // Apply the soft delete plugin to the schema
