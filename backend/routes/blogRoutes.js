@@ -13,6 +13,7 @@ import { authenticate } from '../middlewares/authMiddleware.js';
 import { createBlogSchema, updateBlogSchema, togglePublishSchema } from "../validators/blogValidator.js";
 import { validate } from '../middlewares/validate.js';
 import { apiLimiter, createBlogLimiter } from '../middlewares/rateLimiter.js';
+import {reactionToBlog} from "../controllers/reactionController.js";
 
 const router = express.Router();
 
@@ -20,6 +21,7 @@ router.post('/', authenticate, createBlogLimiter, validate(createBlogSchema), cr
 router.get('/', apiLimiter, getBlogs);
 router.get('/drafts', apiLimiter, authenticate, getUserDrafts);
 router.get('/my-blogs', apiLimiter, authenticate, getMyBlogs);
+router.post('/:id/reaction', authenticate, reactionToBlog)
 router.put('/:id/toggle-publish', apiLimiter, authenticate, validate(togglePublishSchema), togglePublishStatus);
 router.get('/:id', apiLimiter, getBlogById);
 router.put('/:id', apiLimiter, authenticate, validate(updateBlogSchema), updateBlog);

@@ -110,4 +110,14 @@ const togglePublishBlog = async (blogId) => {
   }
 };
 
-export { getBlogs, getBlogById, createBlog, updateBlog, deleteBlog, getUserDrafts, getMyBlogs, togglePublishBlog };
+const sendReaction = async (blogId, emoji) => {
+  try {
+    const res = await axios.post(API_URL  + `${blogId}/reaction`, { emoji }, getAuthHeaders())
+    return res.data
+  } catch (error) {
+    console.error("Error adding reaction:", error);
+    throw error;
+  }
+}
+
+export { getBlogs, getBlogById, createBlog, updateBlog, deleteBlog, getUserDrafts, getMyBlogs, togglePublishBlog, sendReaction };
