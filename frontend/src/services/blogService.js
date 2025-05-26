@@ -113,7 +113,8 @@ const togglePublishBlog = async (blogId) => {
 const sendReaction = async (blogId, emoji) => {
   try {
     const res = await axios.post(API_URL  + `${blogId}/reaction`, { emoji }, getAuthHeaders())
-    return res.data
+    return res.data.data; 
+  
   } catch (error) {
     console.error("Error adding reaction:", error);
     throw error;
