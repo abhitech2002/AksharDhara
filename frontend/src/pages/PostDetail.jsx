@@ -74,7 +74,7 @@ export default function PostDetail() {
     return <div className="text-center py-10 text-red-500">Post not found</div>;
   }
 
-  const isAuthor = currentUserId && post.author?._id === currentUserId;
+  const isAuthor = currentUserId && post.author?.id === currentUserId;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-blue-100 text-gray-800">
