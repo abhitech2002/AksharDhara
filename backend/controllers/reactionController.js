@@ -24,7 +24,7 @@ export const reactionToBlog = async (req, res) => {
 
     if(emoji) {
         if(!reactions.has(emoji)) {
-            reactions.set(emoji, []);
+            reactions.set(emoji, [userId]);
         } else {
             reactions.get(emoji).push(userId);
         }
