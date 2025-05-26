@@ -3,7 +3,7 @@ import { sendReaction } from '../services/blogService';
 
 const emojis = ['❤️', '😂', '😮', '😢', '👎'];
 
-export default function BlogReaction({ blogId, currentUserReaction, reactionCounts: initialCounts }) {
+export default function BlogReaction({ blogId, currentUserReaction, reactionCounts: initialCounts, currentUserId }) {
     const [selected, setSelected] = useState(currentUserReaction || null);
     const [reactionCounts, setReactionCounts] = useState(initialCounts || {});
     const [isLoading, setIsLoading] = useState(false);
@@ -11,24 +11,33 @@ export default function BlogReaction({ blogId, currentUserReaction, reactionCoun
     const [hoveredEmoji, setHoveredEmoji] = useState(null);
   
     const handleReaction = async (emoji) => {
-      if (isLoading) return;
-  
-      setIsLoading(true);
-      setError(null);
-  
-      try {
+        if (isLoading) return;
+      
         const newEmoji = selected === emoji ? null : emoji;
-        const updatedReactions = await sendReaction(blogId, newEmoji); 
+      
+        // Optimistic UI update
+        const newCounts = { ...reactionCounts };
+        emojis.forEach(e => {
+          newCounts[e] = (newCounts[e] || []).filter(id => id !== currentUserId);
+        });
+        if (newEmoji) {
+          newCounts[newEmoji] = [...(newCounts[newEmoji] || []), currentUserId];
+        }
         setSelected(newEmoji);
-  
-        setReactionCounts(updatedReactions || {});
-      } catch (err) {
-        setError('Failed to update reaction');
-        console.error('Reaction error:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+        setReactionCounts(newCounts);
+      
+        try {
+          setIsLoading(true);
+          const updatedReactions = await sendReaction(blogId, newEmoji);
+          setReactionCounts(updatedReactions || {});
+        } catch (err) {
+          setError("Failed to update reaction");
+          console.error("Reaction error:", err);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      
   
     return (
       <div className="flex flex-col gap-2 mt-4">

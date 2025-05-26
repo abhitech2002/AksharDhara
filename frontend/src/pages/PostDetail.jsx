@@ -172,6 +172,7 @@ export default function PostDetail() {
                 blogId={post._id}
                 currentUserReaction={post.userReaction}
                 reactionCounts={post.reactions || {}}
+                currentUserId={currentUserId}
               />
             </div>
           </div>
