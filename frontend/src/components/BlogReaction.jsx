@@ -8,6 +8,7 @@ export default function BlogReaction({ blogId, currentUserReaction, reactionCoun
     const [reactionCounts, setReactionCounts] = useState(initialCounts || {});
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [hoveredEmoji, setHoveredEmoji] = useState(null);
   
     const handleReaction = async (emoji) => {
       if (isLoading) return;
@@ -30,21 +31,50 @@ export default function BlogReaction({ blogId, currentUserReaction, reactionCoun
     };
   
     return (
-      <div className="flex flex-col gap-2 mt-2">
-        <div className="flex gap-2">
+      <div className="flex flex-col gap-2 mt-4">
+        <div className="flex gap-3 items-center bg-gray-50 p-3 rounded-lg shadow-sm">
           {emojis.map((emoji) => (
             <button
               key={emoji}
               onClick={() => handleReaction(emoji)}
+              onMouseEnter={() => setHoveredEmoji(emoji)}
+              onMouseLeave={() => setHoveredEmoji(null)}
               disabled={isLoading}
-              className={`text-2xl transition-transform duration-200 ${selected === emoji ? 'scale-125' : ''} ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`
+                relative group flex flex-col items-center
+                transition-all duration-300 ease-in-out
+                ${selected === emoji ? 'bg-blue-50' : 'hover:bg-gray-100'}
+                ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                rounded-full p-2
+              `}
             >
-              {emoji} {reactionCounts[emoji]?.length || 0}
+              <span className={`
+                text-2xl transform transition-transform duration-200
+                ${selected === emoji ? 'scale-125' : ''}
+                ${hoveredEmoji === emoji ? 'scale-110' : ''}
+              `}>
+                {emoji}
+              </span>
+              <span className={`
+                text-xs font-medium mt-1
+                ${selected === emoji ? 'text-blue-600' : 'text-gray-600'}
+              `}>
+                {reactionCounts[emoji]?.length || 0}
+              </span>
+              {hoveredEmoji === emoji && (
+                <div className="
+                  absolute -top-8 left-1/2 transform -translate-x-1/2
+                  bg-gray-800 text-white text-xs py-1 px-2 rounded
+                  opacity-0 group-hover:opacity-100 transition-opacity duration-200
+                ">
+                  {selected === emoji ? 'Remove reaction' : 'Add reaction'}
+                </div>
+              )}
             </button>
           ))}
         </div>
         {error && (
-          <p className="text-red-500 text-sm mt-1">{error}</p>
+          <p className="text-red-500 text-sm mt-1 bg-red-50 p-2 rounded">{error}</p>
         )}
       </div>
     );
