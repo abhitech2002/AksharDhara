@@ -6,6 +6,7 @@ import DOMPurify from "dompurify";
 import CommentSection from "../components/CommentSection";
 import BlogReaction from "../components/BlogReaction";
 import { useAuth } from "../context/AuthContext";
+import SocialShare from "../components/SocialShare";
 
 export default function PostDetail() {
   const { id } = useParams();
@@ -23,17 +24,17 @@ export default function PostDetail() {
   };
 
   // Get current user from JWT
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        setCurrentUserId(decoded.id);
-      } catch (err) {
-        console.error("Invalid token", err);
-      }
-    }
-  }, []);
+  // useEffect(() => {
+  //   const token = localStorage.getItem("token");
+  //   if (token) {
+  //     try {
+  //       const decoded = jwtDecode(token);
+  //       setCurrentUserId(decoded.id);
+  //     } catch (err) {
+  //       console.error("Invalid token", err);
+  //     }
+  //   }
+  // }, []);
 
   const handleDelete = async () => {
     const confirm = window.confirm(
@@ -81,6 +82,8 @@ export default function PostDetail() {
   const isAuthor =
     currentUserId &&
     (post.author?.id === currentUserId || post.author?._id === currentUserId);
+
+  const blogUrl = `${window.location.origin}/blogs/${post._id}`;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-blue-100 text-gray-800">
@@ -171,6 +174,14 @@ export default function PostDetail() {
               className="prose prose-blue max-w-none prose-img:rounded-xl prose-headings:text-indigo-900 prose-a:text-blue-600"
               dangerouslySetInnerHTML={createMarkup(post.content)}
             />
+
+            {/* ✅ Social Share Section */}
+            <div className="mt-8 border-t pt-6">
+              <h3 className="text-lg font-semibold mb-2 text-gray-700">
+                Share this post:
+              </h3>
+              <SocialShare blogUrl={blogUrl} title={post.title} />
+            </div>
 
             {/* Add BlogReaction component here */}
             <div className="mt-6 border-t pt-6">
