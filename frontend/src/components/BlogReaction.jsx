@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { sendReaction } from "../services/blogService";
+import { useAuth } from "../context/AuthContext";
 
 const emojis = ["❤️", "😂", "😮", "😢", "👎"];
 
@@ -17,6 +18,8 @@ export default function BlogReaction({
   reactionCounts: initialCounts,
   currentUserId,
 }) {
+  const { user } = useAuth();
+
   const [selected, setSelected] = useState(currentUserReaction || null);
   const [reactionCounts, setReactionCounts] = useState(initialCounts || {});
   const [isLoading, setIsLoading] = useState(false);
@@ -24,6 +27,10 @@ export default function BlogReaction({
   const [hoveredEmoji, setHoveredEmoji] = useState(null);
 
   const handleReaction = async (emoji) => {
+    if (!user) {
+      alert("Please log in to react to blogs.");
+      return;
+    }
     if (isLoading) return;
 
     const newEmoji = selected === emoji ? null : emoji;
