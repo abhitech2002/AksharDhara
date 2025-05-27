@@ -1,12 +1,18 @@
 import Blog from "../models/Blog.js";
+import mongoose from "mongoose";
 
 export const reactionToBlog = async (req, res) => {
-  const { blogId } = req.params;
+  const { id } = req.params;
   const { emoji } = req.body;
   const userId = req.user.id;
 
   try {
-    const blog = await Blog.findOne(blogId);
+     if (!mongoose.Types.ObjectId.isValid(id)) {
+      logger.error("Invalid blog ID format:", id);
+      return res.status(400).json({ error: "Invalid blog ID" });
+    }
+
+    const blog = await Blog.findById(id);
 
     if (!blog) {
       return res.status(404).json({ error: "Blog not found" });

@@ -2,21 +2,23 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { getBlogById, deleteBlog } from "../services/blogService";
 import { jwtDecode } from "jwt-decode";
-import DOMPurify from 'dompurify';
+import DOMPurify from "dompurify";
 import CommentSection from "../components/CommentSection";
-import BlogReaction from "../components/BlogReaction"; // Add this import
+import BlogReaction from "../components/BlogReaction";
+import { useAuth } from "../context/AuthContext";
 
 export default function PostDetail() {
   const { id } = useParams();
+  const { user } = useAuth();
+  const currentUserId = user?.id || user?._id;
   const navigate = useNavigate();
 
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [currentUserId, setCurrentUserId] = useState(null);
 
   const createMarkup = (html) => {
     return {
-      __html: DOMPurify.sanitize(html)
+      __html: DOMPurify.sanitize(html),
     };
   };
 
@@ -65,7 +67,9 @@ export default function PostDetail() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        <span className="ml-3 text-lg text-blue-500 font-semibold">Loading post...</span>
+        <span className="ml-3 text-lg text-blue-500 font-semibold">
+          Loading post...
+        </span>
       </div>
     );
   }
@@ -74,7 +78,9 @@ export default function PostDetail() {
     return <div className="text-center py-10 text-red-500">Post not found</div>;
   }
 
-  const isAuthor = currentUserId && post.author?.id === currentUserId;
+  const isAuthor =
+    currentUserId &&
+    (post.author?.id === currentUserId || post.author?._id === currentUserId);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-blue-100 text-gray-800">
@@ -106,29 +112,29 @@ export default function PostDetail() {
           )}
         </div>
 
-                  {!post.isPublished && (
-            <div className="flex items-center mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-700 rounded-lg shadow-sm">
-              <svg
-                className="w-6 h-6 mr-3 flex-shrink-0"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z"
-                ></path>
-              </svg>
-              <p className="text-sm font-semibold">
-                ⚠️ This post is currently a{" "}
-                <span className="italic">draft</span> and not publicly visible.
-              </p>
-            </div>
-          )}
+        {!post.isPublished && (
+          <div className="flex items-center mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-700 rounded-lg shadow-sm">
+            <svg
+              className="w-6 h-6 mr-3 flex-shrink-0"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M13 16h-1v-4h-1m1-4h.01M12 20a8 8 0 100-16 8 8 0 000 16z"
+              ></path>
+            </svg>
+            <p className="text-sm font-semibold">
+              ⚠️ This post is currently a <span className="italic">draft</span>{" "}
+              and not publicly visible.
+            </p>
+          </div>
+        )}
 
         <article className="bg-white rounded-2xl shadow-lg overflow-hidden">
           {/* Cover Image */}
@@ -160,15 +166,15 @@ export default function PostDetail() {
                   #{tag}
                 </span>
               ))}
-            </div>           
-            <div 
+            </div>
+            <div
               className="prose prose-blue max-w-none prose-img:rounded-xl prose-headings:text-indigo-900 prose-a:text-blue-600"
               dangerouslySetInnerHTML={createMarkup(post.content)}
             />
-            
+
             {/* Add BlogReaction component here */}
             <div className="mt-6 border-t pt-6">
-              <BlogReaction 
+              <BlogReaction
                 blogId={post._id}
                 currentUserReaction={post.userReaction}
                 reactionCounts={post.reactions || {}}
