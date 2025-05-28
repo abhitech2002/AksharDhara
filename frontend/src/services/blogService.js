@@ -46,6 +46,16 @@ const getUserDrafts = async () => {
     }
 };
 
+const getBlogBySlug = async (slug) => {
+    try {
+        const response = await axios.get(`${API_URL}${slug}`);
+        return response.data.data;
+    } catch (error) {
+        console.error('Error fetching blog by slug:', error);
+        throw error;
+    }
+};
+
 const getBlogById = async (id) => {
     try {
         const response = await axios.get(`${API_URL}${id}`);
@@ -121,4 +131,4 @@ const sendReaction = async (blogId, emoji) => {
   }
 }
 
-export { getBlogs, getBlogById, createBlog, updateBlog, deleteBlog, getUserDrafts, getMyBlogs, togglePublishBlog, sendReaction };
+export { getBlogs,getBlogBySlug, getBlogById, createBlog, updateBlog, deleteBlog, getUserDrafts, getMyBlogs, togglePublishBlog, sendReaction };
