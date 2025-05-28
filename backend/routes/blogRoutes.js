@@ -8,7 +8,9 @@ import {
   getUserDrafts,
   getMyBlogs,
   togglePublishStatus,
-  getBlogBySlug
+  getBlogBySlug,
+  restoreBlogVersion,
+  getBlogVersions
 } from '../controllers/blogController.js';
 import { authenticate } from '../middlewares/authMiddleware.js';
 import { createBlogSchema, updateBlogSchema, togglePublishSchema } from "../validators/blogValidator.js";
@@ -27,6 +29,8 @@ router.post('/:id/reaction', authenticate, reactionToBlog)
 router.put('/:id/toggle-publish', apiLimiter, authenticate, validate(togglePublishSchema), togglePublishStatus);
 router.get('/:id', apiLimiter, getBlogById);
 router.put('/:slug', apiLimiter, authenticate, validate(updateBlogSchema), updateBlog);
+router.get("/:slug/versions", getBlogVersions);
+router.post("/:slug/restore/:versionIndex", restoreBlogVersion);
 router.delete('/:slug', apiLimiter, authenticate, deleteBlog);
 
 export default router;

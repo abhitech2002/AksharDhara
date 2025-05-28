@@ -1,5 +1,7 @@
 import Blog from "../models/Blog.js";
 import { buildQueryOptions } from "../utils/paginationSearch.js"
+import slugify from "slugify";
+import { generateUniqueSlug } from "../utils/slugifyUnique.js";
 
 export const createBlog = async (req, res) => {
     const { title, content, tags, coverImage, isPublished } = req.body;
@@ -108,11 +110,29 @@ export const updateBlog = async (req, res) => {
             return res.status(403).json({ message: "Unauthorized" });
         }
 
-        const updatedBlog = await Blog.findOneAndUpdate(
-            { slug },
-            { title, content, tags, coverImage, isPublished },
-            { new: true }
-        );
+        blog.versions.push({
+            title: blog.title,
+            content: blog.content,
+            tags: blog.tags,
+            coverImage: blog.coverImage,
+            updatedAt: new Date(),
+        });
+
+        if (blog.versions.length > 10) {
+            blog.versions = blog.versions.slice(-10);
+        }
+        // Update current blog fields
+        blog.title = title;
+        blog.content = content;
+        blog.tags = tags;
+        blog.coverImage = coverImage;
+        blog.isPublished = isPublished;
+
+
+        if (blog.title !== title) {
+            blog.slug = await generateUniqueSlug(title, blog._id);
+        }
+
         res.status(200).json({
             success: true,
             message: "Blog updated successfully",
@@ -122,6 +142,46 @@ export const updateBlog = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
+
+export const restoreBlogVersion = async (req, res) => {
+  try {
+    const { slug, versionIndex } = req.params;
+    const blog = await Blog.findOne({ slug });
+
+    if (!blog || !blog.versions[versionIndex])
+      return res.status(404).json({ message: "Version not found" });
+
+    const version = blog.versions[versionIndex];
+
+    blog.versions.push({
+      title: blog.title,
+      content: blog.content,
+      tags: blog.tags,
+      coverImage: blog.coverImage,
+    });
+
+    blog.title = version.title;
+    blog.content = version.content;
+    blog.tags = version.tags;
+    blog.coverImage = version.coverImage;
+    blog.slug = slugify(version.title, { lower: true, strict: true });
+
+    const updated = await blog.save();
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+export const getBlogVersions = async (req, res) => {
+  const { slug } = req.params;
+  const blog = await Blog.findOne({ slug });
+
+  if (!blog) return res.status(404).json({ message: "Not found" });
+
+  res.status(200).json(blog.versions);
+};
 
 export const deleteBlog = async (req, res) => {
     const { slug } = req.params;
@@ -206,7 +266,7 @@ export const getBlogBySlug = async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
-        
+
     }
 }
 
