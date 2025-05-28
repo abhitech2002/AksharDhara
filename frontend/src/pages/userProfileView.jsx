@@ -300,7 +300,7 @@ export default function UserProfileView() {
                     {/* View Button and Status Toggle */}
                     <div className="mt-auto flex justify-between items-center">
                       <button
-                        onClick={() => navigate(`/posts/${post._id}`)}
+                        onClick={() => navigate(`/posts/${post.slug}`)}
                         className="text-sm text-blue-600 hover:underline"
                       >
                         Read More
@@ -309,12 +309,12 @@ export default function UserProfileView() {
                         onClick={async () => {
                           try {
                             const updated = await togglePublishBlog(
-                              post._id,
+                              post.slug,
                               !post.isPublished
                             );
                             setMyBlogs((prev) =>
                               prev.map((blog) =>
-                                blog._id === post._id
+                                blog.slug === post.slug
                                   ? {
                                       ...blog,
                                       isPublished: updated.isPublished,
@@ -413,7 +413,7 @@ export default function UserProfileView() {
                       </div>
 
                       <Link
-                        to={`/edit/${draft._id}`}
+                        to={`/edit/${draft.slug}`}
                         className="mt-auto inline-block text-center bg-indigo-600 text-white font-semibold rounded-full px-6 py-3 hover:bg-indigo-700 transition"
                         aria-label={`Edit draft titled ${draft.title}`}
                       >

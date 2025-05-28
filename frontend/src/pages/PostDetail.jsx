@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { getBlogById, deleteBlog } from "../services/blogService";
+import { getBlogBySlug, deleteBlog } from "../services/blogService";
 import { jwtDecode } from "jwt-decode";
 import DOMPurify from "dompurify";
 import CommentSection from "../components/CommentSection";
@@ -9,7 +9,7 @@ import { useAuth } from "../context/AuthContext";
 import SocialShare from "../components/SocialShare";
 
 export default function PostDetail() {
-  const { id } = useParams();
+  const { slug } = useParams();
   const { user } = useAuth();
   const currentUserId = user?.id || user?._id;
   const navigate = useNavigate();
@@ -53,16 +53,16 @@ export default function PostDetail() {
   useEffect(() => {
     const getBlog = async () => {
       try {
-        const data = await getBlogById(id);
+        const data = await getBlogBySlug(slug);
         setPost(data);
       } catch (error) {
-        console.error("Error fetching blog by ID:", error);
+        console.error("Error fetching blog by slug:", error);
       } finally {
         setLoading(false);
       }
     };
     getBlog();
-  }, [id]);
+  }, [slug]);
 
   if (loading) {
     return (
@@ -83,7 +83,7 @@ export default function PostDetail() {
     currentUserId &&
     (post.author?.id === currentUserId || post.author?._id === currentUserId);
 
-  const blogUrl = `${window.location.origin}/blogs/${post._id}`;
+  const blogUrl = `${window.location.origin}/blogs/${post.slug}`;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-blue-100 text-gray-800">

@@ -176,7 +176,7 @@ export default function HomePage() {
                         : (post.content))}
                     />
                     <Link
-                      to={`/posts/${post._id}`}
+                      to={`/posts/${post.slug}`}
                       className="mt-auto inline-block text-blue-600 hover:underline text-sm"
                     >
                       Read More →
