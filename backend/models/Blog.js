@@ -1,10 +1,15 @@
 import mongoose from "mongoose";
 import { softDeletePlugin } from "../plugins/softDeletePlugin.js";
+import slugify from "slugify";
 
 const blogSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
+  },
+  slug: {
+    type: String,
+    unique: true,
   },
   content: {
     type: String,
@@ -38,7 +43,13 @@ const blogSchema = new mongoose.Schema({
  }
 }, { timestamps: true });
 
-// Apply the soft delete plugin to the schema
 blogSchema.plugin(softDeletePlugin);
+
+blogSchema.pre("validate", function (next) {
+  if (this.title) {
+    this.slug = slugify(this.title, { lower: true, strict: true });
+  }
+  next();
+});
 
 export default mongoose.model("Blog", blogSchema); 
