@@ -49,6 +49,7 @@ const getUserDrafts = async () => {
 const getBlogBySlug = async (slug) => {
     try {
         const response = await axios.get(`${API_URL}${slug}`);
+        console.log(response)
         return response.data.data;
     } catch (error) {
         console.error('Error fetching blog by slug:', error);
@@ -76,9 +77,9 @@ const createBlog = async (blogData) => {
     }
 };
 
-const updateBlog = async (id, blogData) => {
+const updateBlog = async (slug, blogData) => {
     try {
-        const response = await axios.put(`${API_URL}${id}`, blogData, getAuthHeaders());
+        const response = await axios.put(`${API_URL}${slug}`, blogData, getAuthHeaders());
         return response.data.data;
     } catch (error) {
         console.error('Error updating blog:', error);
@@ -86,9 +87,9 @@ const updateBlog = async (id, blogData) => {
     }
 };
 
-const deleteBlog = async (id) => {
+const deleteBlog = async (slug) => {
     try {
-        await axios.delete(`${API_URL}${id}`, getAuthHeaders());
+        await axios.delete(`${API_URL}${slug}`, getAuthHeaders());
     } catch (error) {
         console.error('Error deleting blog:', error);
         throw error;
