@@ -190,6 +190,26 @@ export const getMyBlogs = async (req, res) => {
     }
 }
 
+export const getBlogBySlug = async (req, res) => {
+    try {
+        const blog = await Blog.findOne({ slug: req.params.slug, isDeleted: false }).populate("author", "username email");
+        if (!blog) {
+            return res.status(404).json({
+                success: false,
+                message: "Blog not found",
+            });
+        }
+        res.status(200).json({
+            success: true,
+            message: "Blog fetched successfully",
+            data: blog,
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+        
+    }
+}
+
 export const togglePublishStatus = async (req, res) => {
     try {
         const blog = await Blog.findOne({ _id: req.params.id, author: req.user.id });

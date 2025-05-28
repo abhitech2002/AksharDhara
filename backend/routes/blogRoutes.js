@@ -8,6 +8,7 @@ import {
   getUserDrafts,
   getMyBlogs,
   togglePublishStatus,
+  getBlogBySlug
 } from '../controllers/blogController.js';
 import { authenticate } from '../middlewares/authMiddleware.js';
 import { createBlogSchema, updateBlogSchema, togglePublishSchema } from "../validators/blogValidator.js";
@@ -21,6 +22,7 @@ router.post('/', authenticate, createBlogLimiter, validate(createBlogSchema), cr
 router.get('/', apiLimiter, getBlogs);
 router.get('/drafts', apiLimiter, authenticate, getUserDrafts);
 router.get('/my-blogs', apiLimiter, authenticate, getMyBlogs);
+router.get('/:slug', apiLimiter, getBlogBySlug);
 router.post('/:id/reaction', authenticate, reactionToBlog)
 router.put('/:id/toggle-publish', apiLimiter, authenticate, validate(togglePublishSchema), togglePublishStatus);
 router.get('/:id', apiLimiter, getBlogById);
