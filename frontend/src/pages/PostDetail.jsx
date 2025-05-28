@@ -43,7 +43,7 @@ export default function PostDetail() {
     if (!confirm) return;
 
     try {
-      await deleteBlog(post._id);
+      await deleteBlog(post.slug);
       navigate("/");
     } catch (error) {
       console.error("Error deleting blog:", error);
@@ -100,7 +100,7 @@ export default function PostDetail() {
           {isAuthor && (
             <div>
               <Link
-                to={`/edit/${post._id}`}
+                to={`/edit/${post.slug}`}
                 className="bg-yellow-500 text-white px-4 py-1 rounded-md text-sm font-semibold hover:bg-yellow-600 transition"
               >
                 ✎ Edit Post

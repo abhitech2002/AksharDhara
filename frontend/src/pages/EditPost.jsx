@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import CreatableSelect from "react-select/creatable";
-import { getBlogById, updateBlog } from "../services/blogService";
+import { getBlogBySlug, updateBlog } from "../services/blogService";
 import { useParams, useNavigate } from "react-router-dom";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
@@ -31,7 +31,8 @@ const formats = [
 ];
 
 export default function EditPost() {
-  const { id } = useParams();
+  const { slug } = useParams();
+  
   const navigate = useNavigate();
 
   const [title, setTitle] = useState("");
@@ -42,10 +43,10 @@ export default function EditPost() {
 
   useEffect(() => {
     const loadBlog = async () => {
-      const blog = await getBlogById(id);
+      const blog = await getBlogBySlug(slug);
+
       setTitle(blog.title);
       setContent(blog.content);
-      // Map existing string tags to react-select format
       const formattedTags = (blog.tags || []).map((tag) => ({
         value: tag,
         label: tag.charAt(0).toUpperCase() + tag.slice(1),
@@ -55,7 +56,7 @@ export default function EditPost() {
       setIsPublished(blog.isPublished || false);
     };
     loadBlog();
-  }, [id]);
+  }, [slug]);
 
   const handleTagsChange = (selectedOptions) => {
     setTags(selectedOptions || []);
@@ -67,14 +68,14 @@ export default function EditPost() {
     const tagsAsStrings = tags.map((tag) => tag.value.toLowerCase());
 
     try {
-      await updateBlog(id, {
+      await updateBlog(slug, {
         title,
         content,
         tags: tagsAsStrings,
         coverImage,
         isPublished,
       });
-      navigate(`/posts/${id}`);
+      navigate(`/posts/${slug}`);
     } catch (error) {
       console.error("Update failed", error);
     }
