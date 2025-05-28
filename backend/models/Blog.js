@@ -2,6 +2,14 @@ import mongoose from "mongoose";
 import { softDeletePlugin } from "../plugins/softDeletePlugin.js";
 import slugify from "slugify";
 
+const blogVersionSchema = new mongoose.Schema({
+  title: String,
+  content: String,
+  coverImage: String,
+  tags: [String],
+  updatedAt: { type: Date, default: Date.now }
+}, { _id: false });
+
 const blogSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -40,7 +48,8 @@ const blogSchema = new mongoose.Schema({
   type: Map,
   of: [String],
   default: {}
- }
+ },
+ versions: [blogVersionSchema],
 }, { timestamps: true });
 
 blogSchema.plugin(softDeletePlugin);
