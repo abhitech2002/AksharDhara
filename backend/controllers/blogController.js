@@ -97,19 +97,19 @@ export const getBlogById = async (req, res) => {
 }
 
 export const updateBlog = async (req, res) => {
-    const { id } = req.params;
+    const { slug } = req.params;
     const { title, content, tags, coverImage, isPublished } = req.body;
 
     try {
-        const blog = await Blog.findById(id);
+        const blog = await Blog.findOne({ slug, isDeleted: false });
         if (!blog) return res.status(404).json({ message: "Not found" });
 
         if (blog.author.toString() !== req.user.id) {
             return res.status(403).json({ message: "Unauthorized" });
         }
 
-        const updatedBlog = await Blog.findByIdAndUpdate(
-            id,
+        const updatedBlog = await Blog.findOneAndUpdate(
+            { slug },
             { title, content, tags, coverImage, isPublished },
             { new: true }
         );
@@ -124,11 +124,11 @@ export const updateBlog = async (req, res) => {
 }
 
 export const deleteBlog = async (req, res) => {
-    const { id } = req.params;
+    const { slug } = req.params;
 
     try {
-        const blog = await Blog.findById(id);
-        if (!blog || blog.isDeleted) {
+        const blog = await Blog.findOne({ slug, isDeleted: false });
+        if (!blog) {
             return res.status(404).json({ success: false, message: "Blog not found" });
         }
         if (blog.author.toString() !== req.user._id) {

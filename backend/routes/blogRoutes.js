@@ -26,7 +26,7 @@ router.get('/:slug', apiLimiter, getBlogBySlug);
 router.post('/:id/reaction', authenticate, reactionToBlog)
 router.put('/:id/toggle-publish', apiLimiter, authenticate, validate(togglePublishSchema), togglePublishStatus);
 router.get('/:id', apiLimiter, getBlogById);
-router.put('/:id', apiLimiter, authenticate, validate(updateBlogSchema), updateBlog);
-router.delete('/:id', apiLimiter, authenticate, deleteBlog);
+router.put('/:slug', apiLimiter, authenticate, validate(updateBlogSchema), updateBlog);
+router.delete('/:slug', apiLimiter, authenticate, deleteBlog);
 
 export default router;
