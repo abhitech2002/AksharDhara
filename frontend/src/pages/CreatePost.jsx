@@ -6,6 +6,8 @@ import DOMPurify from "dompurify";
 import CreatableSelect from "react-select/creatable";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import Toastify from "toastify-js";
+import "toastify-js/src/toastify.css";
 
 const predefinedTags = [
   { label: "React", value: "react" },
@@ -91,8 +93,33 @@ function CreatePost() {
         isPublished,
       };
       await createBlog(newPost);
+      Toastify({
+        text: "Blog created successfully!",
+        className: "info",
+        close: true,
+        duration: 2000,
+        gravity: "top",
+        position: "right",
+        style: {
+          backgroundColor: "#4fbe87",
+        },
+      }).showToast();
+      if (isPublished) {
+        navigate(`/posts/${newPost.slug}`);
+      }
       navigate("/");
     } catch (error) {
+      Toastify({
+        text: "Error creating blog. Please try again.",
+        className: "error",
+        close: true,
+        duration: 2000,
+        gravity: "top",
+        position: "right",
+        style: {
+          backgroundColor: "#f87171", // red-500
+        }
+      }).showToast();
       console.error("Error creating blog:", error);
     }
   };
@@ -230,7 +257,7 @@ function CreatePost() {
                 className="h-64 mb-10"
                 maxLength={maxContentLength}
               />
-            
+
               <div className="char-counter">
                 {content.length} / {maxContentLength}
               </div>

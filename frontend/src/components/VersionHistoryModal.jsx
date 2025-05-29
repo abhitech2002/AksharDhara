@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Dialog } from "@headlessui/react";
 import { useNavigate } from "react-router-dom";
+import Toastify from "toastify-js";
+import "toastify-js/src/toastify.css";
 
 export default function VersionHistoryModal({
   isOpen,
@@ -24,9 +26,30 @@ export default function VersionHistoryModal({
       const res = await axios.get(
         `http://localhost:5000/api/v1/blogs/${slug}/versions`
       );
-      console.log("Fetched versions:", res.data.data);
       setVersions(res.data.data);
+      Toastify({
+        text: "Versions fetched successfully!",
+        className: "info",
+        close: true,
+        duration: 2000,
+        gravity: "top",
+        position: "right",
+        style: {
+          backgroundColor: "#4caf50",
+        },
+      }).showToast();
     } catch (err) {
+      Toastify({
+        text: "Failed to fetch versions.",
+        className: "error",
+        close: true,
+        duration: 2000,
+        gravity: "top",
+        position: "right",
+        style: {
+          backgroundColor: "#f44336",
+        },
+      }).showToast();
       console.error("Error fetching versions", err);
       setVersions([]);
     } finally {

@@ -8,6 +8,8 @@ import BlogReaction from "../components/BlogReaction";
 import { useAuth } from "../context/AuthContext";
 import SocialShare from "../components/SocialShare";
 import VersionHistoryModal from "../components/VersionHistoryModal";
+import Toastify from "toastify-js";
+import "toastify-js/src/toastify.css";
 
 export default function PostDetail() {
   const { slug } = useParams();
@@ -25,19 +27,6 @@ export default function PostDetail() {
     };
   };
 
-  // Get current user from JWT
-  // useEffect(() => {
-  //   const token = localStorage.getItem("token");
-  //   if (token) {
-  //     try {
-  //       const decoded = jwtDecode(token);
-  //       setCurrentUserId(decoded.id);
-  //     } catch (err) {
-  //       console.error("Invalid token", err);
-  //     }
-  //   }
-  // }, []);
-
   const handleDelete = async () => {
     const confirm = window.confirm(
       "Are you sure you want to delete this post?"
@@ -47,7 +36,29 @@ export default function PostDetail() {
     try {
       await deleteBlog(slug);
       navigate("/");
+      Toastify({
+        text: "Blog deleted successfully!",
+        className: "info",
+        close: true,
+        duration: 2000,
+        gravity: "top",
+        position: "right",
+        style: {
+          backgroundColor: "#ff4d4d",
+        },
+      }).showToast();
     } catch (error) {
+      Toastify({
+        text: "Failed to delete blog post.",
+        className: "error",
+        close: true,
+        duration: 2000,
+        gravity: "top",
+        position: "right",
+        style: {
+          backgroundColor: "#ff4d4d",
+        },
+      }).showToast();
       console.error("Error deleting blog:", error);
     }
   };
@@ -57,7 +68,29 @@ export default function PostDetail() {
       try {
         const data = await getBlogBySlug(slug);
         setPost(data);
+        Toastify({
+          text: "Blog fetched successfully!",
+          className: "info",
+          close: true,
+          duration: 2000,
+          gravity: "top",
+          position: "right",
+          style: {
+            backgroundColor: "#4fbe87",
+          },
+        }).showToast();
       } catch (error) {
+        Toastify({
+          text: "Failed to fetch blog post.",
+          className: "error",
+          close: true,
+          duration: 2000,
+          gravity: "top",
+          position: "right",
+          style: {
+            backgroundColor: "#ff4d4d",
+          },
+        }).showToast();
         console.error("Error fetching blog by slug:", error);
       } finally {
         setLoading(false);
@@ -151,7 +184,7 @@ export default function PostDetail() {
           isOpen={isHistoryOpen}
           onClose={() => setIsHistoryOpen(false)}
           slug={post.slug}
-          onRestored={() => window.location.reload()} 
+          onRestored={() => window.location.reload()}
         />
 
         <article className="bg-white rounded-2xl shadow-lg overflow-hidden">

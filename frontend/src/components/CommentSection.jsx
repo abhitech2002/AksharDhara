@@ -6,26 +6,27 @@ import {
 } from "../services/commentService";
 import { useAuth } from "../context/AuthContext";
 import CommentItem from "./CommentItem";
+import Toastify from "toastify-js";
+import "toastify-js/src/toastify.css";
 
 const buildCommentTree = (comments) => {
-    const commentMap = {};
-    const roots = [];
-  
-    const cloned = comments.map(c => ({ ...c, replies: [] }));
-    cloned.forEach(comment => (commentMap[comment._id] = comment));
-  
-    cloned.forEach(comment => {
-      if (comment.parentComment) {
-        const parent = commentMap[comment.parentComment._id];
-        if (parent) parent.replies.push(comment);
-      } else {
-        roots.push(comment);
-      }
-    });
-  
-    return roots;
-  };
-  
+  const commentMap = {};
+  const roots = [];
+
+  const cloned = comments.map((c) => ({ ...c, replies: [] }));
+  cloned.forEach((comment) => (commentMap[comment._id] = comment));
+
+  cloned.forEach((comment) => {
+    if (comment.parentComment) {
+      const parent = commentMap[comment.parentComment._id];
+      if (parent) parent.replies.push(comment);
+    } else {
+      roots.push(comment);
+    }
+  });
+
+  return roots;
+};
 
 const CommentSection = ({ blogId }) => {
   const { user } = useAuth();
@@ -59,15 +60,16 @@ const CommentSection = ({ blogId }) => {
     setIsLoading(true);
     setError(null);
     try {
-      // Basic validation for MongoDB ObjectId format (24 hex characters)
       if (!blogId || !/^[0-9a-fA-F]{24}$/.test(blogId)) {
-        throw new Error('Invalid blog ID');
+        throw new Error("Invalid blog ID");
       }
       const comments = await getCommentsByBlogs(blogId);
       const tree = buildCommentTree(comments.data);
       setComments(tree);
     } catch (err) {
-      setError(err.message || 'Failed to load comments. Please try again later.');
+      setError(
+        err.message || "Failed to load comments. Please try again later."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -87,15 +89,36 @@ const CommentSection = ({ blogId }) => {
       };
       await createComment(comment);
       setNewComment("");
+      Toastify({
+        text: "Comment posted successfully!",
+        className: "info",        
+        close: true,
+        duration: 2000,
+        gravity: "top",
+        position: "right",
+        style: {
+          backgroundColor: "#4fbe87",
+        },
+      }).showToast();
       await loadComments();
     } catch (err) {
       setError("Failed to post comment. Please try again.");
+      Toastify({
+        text: "Failed to post comment.",
+        className: "error",
+        close: true,
+        duration: 2000,
+        gravity: "top",
+        position: "right",
+        style: {
+          backgroundColor: "#f87171",
+        },
+      }).showToast();
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Add this useEffect to load comments when component mounts or blogId changes
   useEffect(() => {
     loadComments();
   }, [blogId]);
@@ -103,9 +126,20 @@ const CommentSection = ({ blogId }) => {
   const handleDelete = async (commentId) => {
     try {
       await deleteComment(commentId);
+      Toastify({
+        text: "Comment deleted successfully!",
+        className: "info",
+        close: true,
+        duration: 2000,
+        gravity: "top",
+        position: "right",
+        style: {
+          backgroundColor: "#ff4d4d",
+        },
+      }).showToast();
       await loadComments();
     } catch (err) {
-      setError('Failed to delete comment. Please try again.');
+      setError("Failed to delete comment. Please try again.");
     }
   };
 
@@ -115,23 +149,23 @@ const CommentSection = ({ blogId }) => {
         content,
         blog: blogId,
         author: user.id,
-        parentComment: parentId
+        parentComment: parentId,
       };
       const response = await createComment(comment);
       addReplyToComment(parentId, response.data);
     } catch (err) {
-      setError('Failed to post reply. Please try again.');
+      setError("Failed to post reply. Please try again.");
     }
   };
 
   return (
     <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-6 space-y-6">
-      <h3 className="text-2xl font-semibold text-gray-800 border-b pb-4">Discussion</h3>
+      <h3 className="text-2xl font-semibold text-gray-800 border-b pb-4">
+        Discussion
+      </h3>
 
       {error && (
-        <div className="bg-red-50 text-red-600 p-4 rounded-lg">
-          {error}
-        </div>
+        <div className="bg-red-50 text-red-600 p-4 rounded-lg">{error}</div>
       )}
 
       {user && (
@@ -147,13 +181,31 @@ const CommentSection = ({ blogId }) => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`absolute bottom-3 right-3 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-200 ease-in-out flex items-center space-x-2 text-sm font-medium ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`absolute bottom-3 right-3 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-200 ease-in-out flex items-center space-x-2 text-sm font-medium ${
+                isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
               {isSubmitting ? (
                 <>
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
                   Posting...
                 </>
@@ -183,7 +235,7 @@ const CommentSection = ({ blogId }) => {
               onReply={handleReply}
               onDelete={handleDelete}
               onLocalReplyUpdate={addReplyToComment}
-              loadComments={loadComments}  // Add this prop
+              loadComments={loadComments} // Add this prop
             />
           ))
         )}

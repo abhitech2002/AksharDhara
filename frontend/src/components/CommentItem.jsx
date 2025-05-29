@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { createComment } from "../services/commentService";
+import Toastify from "toastify-js";
+import "toastify-js/src/toastify.css";
 
 const CommentItem = ({
   comment,  
@@ -17,7 +18,6 @@ const CommentItem = ({
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    // If replies are collapsed, also reset the reply text and hide box
     if (isCollapsed) {
       setReplyText("");
       setShowReplyBox(false);
@@ -42,8 +42,30 @@ const CommentItem = ({
         onLocalReplyUpdate(createdReply.data);
       }
       setReplyText("");
+      Toastify({
+        text: "Reply posted successfully!",
+        className: "info",
+        close: true,
+        duration: 2000,
+        gravity: "top",
+        position: "right",
+        style: {
+          backgroundColor: "#4caf50",
+        },
+      }).showToast();
       setShowReplyBox(false);
     } catch (error) {
+      Toastify({
+        text: "Failed to post reply. Please try again.",
+        className: "error",
+        close: true,
+        duration: 2000,
+        gravity: "top",
+        position: "right",
+        style: {
+          backgroundColor: "#f44336",
+        },
+      }).showToast();
       setError("Failed to post reply. Please try again.");
     } finally {
       setIsSubmitting(false);

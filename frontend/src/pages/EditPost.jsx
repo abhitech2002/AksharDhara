@@ -4,6 +4,8 @@ import { getBlogBySlug, updateBlog } from "../services/blogService";
 import { useParams, useNavigate } from "react-router-dom";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import Toastify from 'toastify-js'
+import "toastify-js/src/toastify.css"
 
 // Example tag options — you can customize or fetch dynamically
 const tagOptions = [
@@ -76,8 +78,30 @@ export default function EditPost() {
         isPublished,
       });
       navigate(`/posts/${slug}`);
+      Toastify({
+        text: "Post updated successfully!",
+        className: "info",
+        close: true,
+        duration: 2000,
+        gravity: "top",
+        position: "right",
+        style: {
+          backgroundColor: "#4fbe87",
+        },
+      }).showToast();
     } catch (error) {
       console.error("Update failed", error);
+      Toastify({
+        text: "Error updating post. Please try again.",
+        className: "error",
+        close: true,
+        duration: 2000,
+        gravity: "top",
+        position: "right",
+        style: {
+          backgroundColor: "#f87171",
+        },
+      }).showToast();
     }
   };
 
