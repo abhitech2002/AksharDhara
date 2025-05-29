@@ -24,7 +24,7 @@ app.use(cors({
   credentials: true,
   maxAge: 86400 // 24 hours
 }));
-app.use(express.json({limit: '10kb'}));
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Add request logging middleware before routes

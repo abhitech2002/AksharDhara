@@ -1,7 +1,8 @@
 import Blog from "../models/Blog.js";
-import { buildQueryOptions } from "../utils/paginationSearch.js"
+import { buildQueryOptions } from "../utils/paginationSearch.js";
 import slugify from "slugify";
 import { generateUniqueSlug } from "../utils/slugifyUnique.js";
+import { logger } from "../config/logger.js";
 
 export const createBlog = async (req, res) => {
     const { title, content, tags, coverImage, isPublished } = req.body;
@@ -14,7 +15,7 @@ export const createBlog = async (req, res) => {
             author,
             tags,
             coverImage,
-            isPublished
+            isPublished,
         });
 
         await newBlog.save();
@@ -26,7 +27,7 @@ export const createBlog = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-}
+};
 
 export const getBlogs = async (req, res) => {
     try {
@@ -76,12 +77,14 @@ export const getUserDrafts = async (req, res) => {
     }
 };
 
-
 export const getBlogById = async (req, res) => {
     const { id } = req.params;
 
     try {
-        const blog = await Blog.findById({ _id: id, isDeleted: false }).populate("author", "username email");
+        const blog = await Blog.findById({ _id: id, isDeleted: false }).populate(
+            "author",
+            "username email"
+        );
         if (!blog) {
             return res.status(404).json({
                 success: false,
@@ -96,7 +99,7 @@ export const getBlogById = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-}
+};
 
 export const updateBlog = async (req, res) => {
     const { slug } = req.params;
@@ -128,10 +131,11 @@ export const updateBlog = async (req, res) => {
         blog.coverImage = coverImage;
         blog.isPublished = isPublished;
 
-
         if (blog.title !== title) {
             blog.slug = await generateUniqueSlug(title, blog._id);
         }
+
+        const updatedBlog = await blog.save();
 
         res.status(200).json({
             success: true,
@@ -141,46 +145,60 @@ export const updateBlog = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-}
-
-export const restoreBlogVersion = async (req, res) => {
-  try {
-    const { slug, versionIndex } = req.params;
-    const blog = await Blog.findOne({ slug });
-
-    if (!blog || !blog.versions[versionIndex])
-      return res.status(404).json({ message: "Version not found" });
-
-    const version = blog.versions[versionIndex];
-
-    blog.versions.push({
-      title: blog.title,
-      content: blog.content,
-      tags: blog.tags,
-      coverImage: blog.coverImage,
-    });
-
-    blog.title = version.title;
-    blog.content = version.content;
-    blog.tags = version.tags;
-    blog.coverImage = version.coverImage;
-    blog.slug = slugify(version.title, { lower: true, strict: true });
-
-    const updated = await blog.save();
-    res.json(updated);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
 };
 
+export const restoreBlogVersion = async (req, res) => {
+    try {
+        const { slug, versionIndex } = req.params;
+        const blog = await Blog.findOne({ slug });
+
+        if (!blog || !blog.versions[versionIndex])
+            return res.status(404).json({ message: "Version not found" });
+
+        const version = blog.versions[versionIndex];
+
+        blog.versions.push({
+            title: blog.title,
+            content: blog.content,
+            tags: blog.tags,
+            coverImage: blog.coverImage,
+        });
+
+        blog.title = version.title;
+        blog.content = version.content;
+        blog.tags = version.tags;
+        blog.coverImage = version.coverImage;
+        blog.slug = slugify(version.title, { lower: true, strict: true });
+
+        const updated = await blog.save();
+        res.status(200).json({
+            success: true,
+            message: "Version restored successfully",
+            data: updated.slug, 
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
 
 export const getBlogVersions = async (req, res) => {
-  const { slug } = req.params;
-  const blog = await Blog.findOne({ slug });
+    try {
+        const { slug } = req.params;
+        const blog = await Blog.findOne({ slug });
 
-  if (!blog) return res.status(404).json({ message: "Not found" });
+        if (!blog) return res.status(404).json({ message: "Not found" });
 
-  res.status(200).json(blog.versions);
+        res
+            .status(200)
+            .json({
+                success: true,
+                message: "Blog versions fetched successfully",
+                data: blog.versions,
+            });
+    } catch (error) {
+        logger.error("Error fetching blog versions:", error);
+        res.status(500).json({ message: error.message });
+    }
 };
 
 export const deleteBlog = async (req, res) => {
@@ -189,9 +207,11 @@ export const deleteBlog = async (req, res) => {
     try {
         const blog = await Blog.findOne({ slug, isDeleted: false });
         if (!blog) {
-            return res.status(404).json({ success: false, message: "Blog not found" });
+            return res
+                .status(404)
+                .json({ success: false, message: "Blog not found" });
         }
-        if (blog.author.toString() !== req.user._id) {
+        if (blog.author.toString() !== req.user.id) {
             return res.status(403).json({ message: "Unauthorized" });
         }
 
@@ -203,9 +223,10 @@ export const deleteBlog = async (req, res) => {
             message: "Blog soft-deleted successfully",
         });
     } catch (error) {
+        logger.error("Error deleting blog:", error);
         res.status(500).json({ message: error.message });
     }
-}
+};
 
 export const restoreBlog = async (req, res) => {
     const { id } = req.params;
@@ -213,7 +234,9 @@ export const restoreBlog = async (req, res) => {
     try {
         const blog = await Blog.findById(id);
         if (!blog || !blog.isDeleted) {
-            return res.status(404).json({ success: false, message: "Blog not found" });
+            return res
+                .status(404)
+                .json({ success: false, message: "Blog not found" });
         }
         if (blog.author.toString() !== req.user._id) {
             return res.status(403).json({ message: "Unauthorized" });
@@ -230,8 +253,7 @@ export const restoreBlog = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-}
-
+};
 
 // =================Get Blogs by author=================
 export const getMyBlogs = async (req, res) => {
@@ -248,11 +270,14 @@ export const getMyBlogs = async (req, res) => {
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
-}
+};
 
 export const getBlogBySlug = async (req, res) => {
     try {
-        const blog = await Blog.findOne({ slug: req.params.slug, isDeleted: false }).populate("author", "username email");
+        const blog = await Blog.findOne({
+            slug: req.params.slug,
+            isDeleted: false,
+        }).populate("author", "username email");
         if (!blog) {
             return res.status(404).json({
                 success: false,
@@ -266,15 +291,19 @@ export const getBlogBySlug = async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
-
     }
-}
+};
 
 export const togglePublishStatus = async (req, res) => {
     try {
-        const blog = await Blog.findOne({ _id: req.params.id, author: req.user.id });
+        const blog = await Blog.findOne({
+            _id: req.params.id,
+            author: req.user.id,
+        });
         if (!blog) {
-            return res.status(404).json({ success: false, message: "Blog not found" });
+            return res
+                .status(404)
+                .json({ success: false, message: "Blog not found" });
         }
 
         blog.isPublished = !blog.isPublished;
@@ -282,9 +311,9 @@ export const togglePublishStatus = async (req, res) => {
         res.status(200).json({
             success: true,
             message: `Blog ${blog.isPublished ? "published" : "unpublished"}`,
-            data: blog
+            data: blog,
         });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
-}
+};
