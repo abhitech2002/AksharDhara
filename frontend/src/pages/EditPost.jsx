@@ -203,7 +203,7 @@ export default function EditPost() {
               </button>
               <button
                 type="button"
-                onClick={() => navigate(`/posts/${id}`)}
+                onClick={() => navigate(`/posts/${slug}`)}
                 className="bg-gray-300 text-gray-800 px-6 py-3 rounded-xl hover:bg-gray-400 transition"
               >
                 Cancel

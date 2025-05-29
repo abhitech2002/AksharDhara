@@ -7,6 +7,7 @@ import CommentSection from "../components/CommentSection";
 import BlogReaction from "../components/BlogReaction";
 import { useAuth } from "../context/AuthContext";
 import SocialShare from "../components/SocialShare";
+import VersionHistoryModal from "../components/VersionHistoryModal";
 
 export default function PostDetail() {
   const { slug } = useParams();
@@ -16,6 +17,7 @@ export default function PostDetail() {
 
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   const createMarkup = (html) => {
     return {
@@ -43,7 +45,7 @@ export default function PostDetail() {
     if (!confirm) return;
 
     try {
-      await deleteBlog(post.slug);
+      await deleteBlog(slug);
       navigate("/");
     } catch (error) {
       console.error("Error deleting blog:", error);
@@ -111,6 +113,12 @@ export default function PostDetail() {
               >
                 🗑 Delete Post
               </button>
+              <button
+                onClick={() => setIsHistoryOpen(true)}
+                className="ml-4 bg-gray-100 text-sm px-3 py-1 rounded-md hover:bg-gray-200"
+              >
+                🕒 View History
+              </button>
             </div>
           )}
         </div>
@@ -138,6 +146,13 @@ export default function PostDetail() {
             </p>
           </div>
         )}
+
+        <VersionHistoryModal
+          isOpen={isHistoryOpen}
+          onClose={() => setIsHistoryOpen(false)}
+          slug={post.slug}
+          onRestored={() => window.location.reload()} 
+        />
 
         <article className="bg-white rounded-2xl shadow-lg overflow-hidden">
           {/* Cover Image */}
