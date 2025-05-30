@@ -10,6 +10,7 @@ import DraftsDashboard from './pages/DraftsDashboard'
 import Dashboard from './pages/Dashboard'
 import UserProfile from './pages/UserProfile'
 import UserProfileView from "./pages/userProfileView";
+import AllArticles from './pages/AllArticles'
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/profile" element={<UserProfile />} />
         <Route path="/profile/view" element={<UserProfileView />} />
+        <Route path="/posts" element={<AllArticles />} />
         <Route path="/create" element={<ProtectedRoute><CreatePost /></ProtectedRoute>} />
         <Route path="/edit/:slug" element={<><ProtectedRoute><EditPost /></ProtectedRoute></>} />
       </Routes>
