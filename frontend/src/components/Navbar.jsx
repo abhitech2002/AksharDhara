@@ -98,15 +98,15 @@ export default function Navbar() {
             {user && (
               <>
                 <Link
-                  to="/explore"
+                  to="/posts"
                   className={`nav-link ${
-                    isActivePath("/explore") ? "active" : ""
+                    isActivePath("/posts") ? "active" : ""
                   }`}
                 >
                   Explore
                 </Link>
                 <Link
-                  to="/write"
+                  to="/create"
                   className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 shadow-md hover:shadow-lg"
                 >
                   Write
@@ -220,15 +220,15 @@ export default function Navbar() {
             {user && (
               <>
                 <Link
-                  to="/explore"
+                  to="/posts"
                   className={`mobile-nav-link ${
-                    isActivePath("/explore") ? "active" : ""
+                    isActivePath("/posts") ? "active" : ""
                   }`}
                 >
                   Explore
                 </Link>
                 <Link
-                  to="/write"
+                  to="/create"
                   className="block mx-4 my-2 px-4 py-3 text-center text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
                 >
                   Write New Post
@@ -256,14 +256,14 @@ export default function Navbar() {
                   >
                     Drafts
                   </Link>
-                  <Link
+                  {/* <Link
                     to="/settings"
                     className={`mobile-nav-link ${
                       isActivePath("/settings") ? "active" : ""
                     }`}
                   >
                     Settings
-                  </Link>
+                  </Link> */}
                   <button
                     onClick={handleLogout}
                     className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
